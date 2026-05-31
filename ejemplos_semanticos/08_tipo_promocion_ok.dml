@@ -1,0 +1,10 @@
+// Regla 3 — promocion entero->real valida; solo el tercero debe fallar.
+// real a <- 5 (entero promociona a real: OK); real b <- 3.14 (real: OK);
+// entero z <- 3.14 (real a entero: NO se permite) -> TIPO_ASIGNACION.
+// (Se evitan 'y'/'o'/'no' como nombres: son palabras clave en DiamondLang.)
+funcion principal()
+hacer
+    real a <- 5
+    real b <- 3.14
+    entero z <- 3.14
+fin_funcion

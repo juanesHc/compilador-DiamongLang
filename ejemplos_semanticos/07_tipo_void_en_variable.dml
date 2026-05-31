@@ -1,0 +1,8 @@
+// Regla 3 (sub-regla) — TIPO_VOID_EN_VARIABLE en línea 7, col 11 ('v').
+// 'vacio' sólo es válido como tipo de retorno, no como tipo de variable.
+// El símbolo se guarda como 'ERROR' para suprimir un TIPO_ASIGNACION
+// redundante: el único error esperado es TIPO_VOID_EN_VARIABLE.
+funcion principal()
+hacer
+    vacio v <- 0
+fin_funcion

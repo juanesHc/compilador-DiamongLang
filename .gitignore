@@ -1,0 +1,23 @@
+# Variables de entorno (contienen API keys, NO subir al repo)
+.env
+.env.local
+.env.*.local
+
+venv/
+
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

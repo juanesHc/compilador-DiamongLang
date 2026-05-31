@@ -1,0 +1,6 @@
+// Regla 2 — USO_NO_DECLARADO (función) en línea 4, col 17 (llamada 'inexistente').
+funcion principal()
+hacer
+    entero x <- inexistente(5)
+    escribir(x)
+fin_funcion

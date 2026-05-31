@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DiamondLang IDE - Lexical Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#84dcf5",
+                        "secondary-fixed": "#cae6ff",
+                        "surface": "#17130d",
+                        "primary-fixed": "#ffddaf",
+                        "outline": "#9c8f7e",
+                        "inverse-primary": "#805600",
+                        "surface-container-low": "#1f1b15",
+                        "on-primary-fixed": "#281800",
+                        "on-tertiary": "#003641",
+                        "secondary-fixed-dim": "#9dccf2",
+                        "on-primary-fixed-variant": "#614000",
+                        "primary-container": "#ffc66d",
+                        "outline-variant": "#4f4537",
+                        "surface-container-lowest": "#120e08",
+                        "inverse-surface": "#ebe1d7",
+                        "surface-container-high": "#2e2923",
+                        "surface-container": "#241f19",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "tertiary-fixed-dim": "#7bd3ec",
+                        "on-tertiary-fixed": "#001f26",
+                        "secondary": "#9dccf2",
+                        "on-secondary": "#00344e",
+                        "tertiary": "#cbf2ff",
+                        "surface-dim": "#17130d",
+                        "on-surface-variant": "#d3c4b2",
+                        "on-secondary-container": "#8fbee3",
+                        "surface-bright": "#3e3831",
+                        "on-primary": "#442c00",
+                        "secondary-container": "#174d6e",
+                        "on-tertiary-container": "#006173",
+                        "background": "#17130d",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#afecff",
+                        "primary": "#ffe9cc",
+                        "on-secondary-fixed-variant": "#144b6b",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#39342d",
+                        "on-background": "#ebe1d7",
+                        "on-primary-container": "#785100",
+                        "surface-container-highest": "#39342d",
+                        "on-surface": "#ebe1d7",
+                        "primary-fixed-dim": "#f5bd65",
+                        "inverse-on-surface": "#353029",
+                        "on-secondary-fixed": "#001e30",
+                        "surface-tint": "#f5bd65",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "ide-bg": "#2B2B2B",
+                        "ide-panel": "#3C3F41",
+                        "ide-border": "#323232",
+                        "syntax-keyword": "#CC7832",
+                        "syntax-number": "#6897BB",
+                        "syntax-id": "#A9B7C6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-sm": "8px",
+                        "margin-md": "16px",
+                        "gutter": "1px",
+                        "panel-padding": "12px",
+                        "toolbar-height": "48px",
+                        "sidebar-width": "240px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            font-size: 18px;
+        }
+        body {
+            background-color: #2B2B2B;
+            color: #A9B7C6;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2B2B2B;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4E5254;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #5E6264;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding h-toolbar-height bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-8">
+<span class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter">DiamondLang</span>
+<nav class="hidden md:flex gap-6 items-center h-full">
+<a class="text-on-surface-variant font-medium hover:bg-surface-variant transition-colors" href="#">Docs</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-variant transition-colors" href="#">Specs</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-variant transition-colors" href="#">Playground</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-outline-variant overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyMdgNKj9_RNyznfiTx40YZMwfX4CmaGearDD-QeJYzUqxv4y1En45TPl8uykn2wRQUwbBFipjsQcJwvR98CXOynyZ4UZGLjercS65fslswCnHS0nsRQ5tVCqhhiC6kd3vbqY4xT0mEFswEcgbbk1Ez0JYcpxu-HZz_sqeBVKE2sEdO6pD6Bb15pBbS20wJF_aUcWyImM45aK8rAKOWNPlMv-KCLBBt-hyRRJz-0vpLFrYmclzM_Jc6UOwudG1wiTayfNlVjdAYg"/>
+</div>
+</div>
+</header>
+<!-- Sidebar & Main Content Wrapper -->
+<div class="flex flex-1 pt-toolbar-height pb-8">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-toolbar-height h-[calc(100vh-48px)] flex flex-col w-sidebar-width z-40 bg-surface-container-low border-r border-outline-variant">
+<div class="p-4 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-sm flex items-center justify-center text-on-primary font-bold">D</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary leading-none">v4.0</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Server active
+                    </div>
+</div>
+</div>
+<nav class="mt-4 flex-1">
+<div class="px-2 py-1">
+<button class="w-full flex items-center gap-3 px-3 py-2 bg-secondary-container text-on-secondary-container border-r-2 border-secondary font-label-caps text-label-caps text-left transition-all">
+<span class="material-symbols-outlined" data-icon="code">code</span> Lexical
+                    </button>
+<button class="w-full flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant font-label-caps text-label-caps text-left transition-all">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span> Syntactic
+                    </button>
+<button class="w-full flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant font-label-caps text-label-caps text-left transition-all">
+<span class="material-symbols-outlined" data-icon="grid_on">grid_on</span> LL(1) Table
+                    </button>
+<button class="w-full flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant font-label-caps text-label-caps text-left transition-all">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span> First / Follow
+                    </button>
+</div>
+</nav>
+<div class="p-4 border-t border-outline-variant">
+<button class="w-full bg-primary-container text-on-primary-container font-bold py-2 rounded-lg hover:opacity-80 transition-opacity active:scale-95 duration-100">
+                    Analyze Code
+                </button>
+</div>
+<div class="mt-auto p-2 border-t border-outline-variant flex flex-col gap-1">
+<button class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+                </button>
+<button class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps">
+<span class="material-symbols-outlined" data-icon="help">help</span> Help
+                </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-sidebar-width flex-1 p-4 grid grid-cols-2 grid-rows-[3fr,2fr] gap-4 overflow-hidden">
+<!-- TOP-LEFT: Editor Panel -->
+<section class="bg-ide-panel rounded border border-ide-border flex flex-col overflow-hidden shadow-sm">
+<div class="h-9 px-3 bg-[#323232] border-b border-ide-border flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-syntax-keyword" data-icon="description">description</span>
+<span class="text-body-sm font-medium">Editor — DiamondLang</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Ln 12, Col 8</span>
+</div>
+<div class="flex-1 flex overflow-hidden">
+<div class="w-12 bg-[#2B2B2B] border-r border-ide-border text-right px-2 py-4 font-code-sm text-code-sm text-[#606366] flex flex-col gap-0.5">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<div class="flex-1 p-4 font-code-md text-code-md overflow-auto custom-scrollbar whitespace-pre text-[#A9B7C6] bg-[#2B2B2B]">
+<span class="text-syntax-keyword">funcion</span> <span class="text-syntax-id">factorial</span>(<span class="text-syntax-keyword">entero</span> <span class="text-syntax-id">n</span>) <span class="text-syntax-keyword">retornar</span> <span class="text-syntax-keyword">entero</span>
+<span class="text-syntax-keyword">hacer</span>
+<span class="text-syntax-keyword">si</span> <span class="text-syntax-id">n</span> &lt;= <span class="text-syntax-number">1</span> <span class="text-syntax-keyword">entonces</span>
+<span class="text-syntax-keyword">retornar</span> <span class="text-syntax-number">1</span>
+<span class="text-syntax-keyword">sino</span>
+<span class="text-syntax-keyword">retornar</span> <span class="text-syntax-id">n</span> * <span class="text-syntax-id">factorial</span>(<span class="text-syntax-id">n</span> - <span class="text-syntax-number">1</span>)
+    <span class="text-syntax-keyword">fin_si</span>
+<span class="text-syntax-keyword">fin_funcion</span></div>
+</div>
+<div class="h-12 px-3 border-t border-ide-border flex items-center justify-between shrink-0 bg-[#3C3F41]">
+<div class="flex items-center gap-2">
+<button class="bg-primary-container text-on-primary-container px-3 py-1.5 rounded-sm font-label-caps text-label-caps flex items-center gap-1.5 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-[14px]" data-icon="play_arrow">play_arrow</span>
+                            ANALYZE LEXICAL
+                        </button>
+<div class="relative group">
+<button class="border border-ide-border px-3 py-1.5 rounded-sm font-label-caps text-label-caps flex items-center gap-1 hover:bg-surface-variant transition-all">
+                                📂 EXAMPLES
+                                <span class="material-symbols-outlined text-[14px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+<button class="p-1.5 hover:bg-surface-variant rounded transition-all text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+</section>
+<!-- TOP-RIGHT: Tokens Panel -->
+<section class="bg-ide-panel rounded border border-ide-border flex flex-col overflow-hidden shadow-sm">
+<div class="h-9 px-3 bg-[#323232] border-b border-ide-border flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="view_list">view_list</span>
+<span class="text-body-sm font-medium">Tokens</span>
+</div>
+<span class="bg-[#2B2B2B] text-[10px] px-2 py-0.5 rounded-full border border-ide-border font-bold text-secondary">128 TOKENS</span>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar p-3 space-y-3 bg-[#2B2B2B]">
+<!-- Token Stream -->
+<div class="flex items-start gap-4">
+<span class="font-code-sm text-code-sm text-[#606366] w-4 mt-1">1</span>
+<div class="flex flex-wrap gap-2">
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">funcion</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">factorial</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500">(</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">entero</span>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="font-code-sm text-code-sm text-[#606366] w-4 mt-1">2</span>
+<div class="flex flex-wrap gap-2">
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">hacer</span>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="font-code-sm text-code-sm text-[#606366] w-4 mt-1">3</span>
+<div class="flex flex-wrap gap-2">
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">si</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">n</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-rose-400/30 bg-rose-400/10 text-rose-400">&lt;=</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#6897BB]/30 bg-[#6897BB]/10 text-[#6897BB]">1</span>
+</div>
+</div>
+</div>
+<div class="h-10 px-3 border-t border-ide-border flex items-center gap-4 shrink-0 bg-[#3C3F41] overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-[#CC7832] rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">KEYWORD</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-slate-400 rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">ID</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-[#6897BB] rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">NUM</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-rose-400 rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">OP</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-red-500 rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">ERROR</span>
+</div>
+</div>
+</section>
+<!-- BOTTOM: Symbol Table Panel -->
+<section class="bg-ide-panel rounded border border-ide-border flex flex-col col-span-2 overflow-hidden shadow-sm">
+<div class="h-9 px-3 bg-[#323232] border-b border-ide-border flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="table_chart">table_chart</span>
+<span class="text-body-sm font-medium">Symbol Table</span>
+</div>
+<span class="text-body-sm text-on-surface-variant">32 Entries</span>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar bg-[#2B2B2B]">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-[#323232] shadow-sm z-10">
+<tr class="text-label-caps font-label-caps text-on-surface-variant border-b border-ide-border">
+<th class="px-4 py-2 font-medium w-16">#</th>
+<th class="px-4 py-2 font-medium">Lexeme</th>
+<th class="px-4 py-2 font-medium">Token Type</th>
+<th class="px-4 py-2 font-medium w-24 text-center">Line</th>
+<th class="px-4 py-2 font-medium w-24 text-center">Column</th>
+</tr>
+</thead>
+<tbody class="font-code-sm text-code-sm">
+<tr class="border-b border-ide-border/50 hover:bg-[#323232] transition-colors">
+<td class="px-4 py-2 text-[#606366]">001</td>
+<td class="px-4 py-2 font-medium">funcion</td>
+<td class="px-4 py-2">
+<span class="px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">KEYWORD</span>
+</td>
+<td class="px-4 py-2 text-center">1</td>
+<td class="px-4 py-2 text-center">1</td>
+</tr>
+<tr class="border-b border-ide-border/50 hover:bg-[#323232] transition-colors">
+<td class="px-4 py-2 text-[#606366]">002</td>
+<td class="px-4 py-2 font-medium">factorial</td>
+<td class="px-4 py-2">
+<span class="px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">ID</span>
+</td>
+<td class="px-4 py-2 text-center">1</td>
+<td class="px-4 py-2 text-center">9</td>
+</tr>
+<tr class="border-b border-ide-border/50 hover:bg-[#323232] transition-colors">
+<td class="px-4 py-2 text-[#606366]">003</td>
+<td class="px-4 py-2 font-medium">entero</td>
+<td class="px-4 py-2">
+<span class="px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">TYPE</span>
+</td>
+<td class="px-4 py-2 text-center">1</td>
+<td class="px-4 py-2 text-center">20</td>
+</tr>
+<tr class="border-b border-ide-border/50 hover:bg-[#323232] transition-colors">
+<td class="px-4 py-2 text-[#606366]">004</td>
+<td class="px-4 py-2 font-medium">n</td>
+<td class="px-4 py-2">
+<span class="px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">ID</span>
+</td>
+<td class="px-4 py-2 text-center">1</td>
+<td class="px-4 py-2 text-center">27</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="h-8 px-4 border-t border-ide-border flex items-center bg-[#3C3F41] shrink-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant">
+                        Total: 128 · Keywords: 18 · IDs: 32 · Errors: 0
+                    </span>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full flex justify-between items-center px-4 py-2 z-30 bg-surface-container-lowest border-t border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-tighter">© 2024 DiamondLang Foundation</span>
+<div class="flex gap-4">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for panel hover
+        document.querySelectorAll('section').forEach(section => {
+            section.addEventListener('mouseenter', () => {
+                section.classList.add('border-primary/20');
+            });
+            section.addEventListener('mouseleave', () => {
+                section.classList.remove('border-primary/20');
+            });
+        });
+    </script>
+</body></html>

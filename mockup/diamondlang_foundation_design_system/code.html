@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DiamondLang IDE - Design Tokens</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#001e30",
+                    "on-surface-variant": "#d3c4b2",
+                    "on-error": "#690005",
+                    "on-primary-container": "#785100",
+                    "on-secondary-container": "#8fbee3",
+                    "surface-container-lowest": "#120e08",
+                    "surface": "#17130d",
+                    "secondary-fixed": "#cae6ff",
+                    "surface-tint": "#f5bd65",
+                    "on-primary": "#442c00",
+                    "on-primary-fixed-variant": "#614000",
+                    "tertiary-fixed": "#afecff",
+                    "surface-bright": "#3e3831",
+                    "primary-fixed": "#ffddaf",
+                    "on-secondary": "#00344e",
+                    "surface-variant": "#39342d",
+                    "on-tertiary-fixed-variant": "#004e5d",
+                    "surface-container": "#241f19",
+                    "tertiary-container": "#84dcf5",
+                    "on-tertiary": "#003641",
+                    "outline": "#9c8f7e",
+                    "on-tertiary-fixed": "#001f26",
+                    "tertiary-fixed-dim": "#7bd3ec",
+                    "secondary": "#9dccf2",
+                    "primary-fixed-dim": "#f5bd65",
+                    "surface-container-low": "#1f1b15",
+                    "primary-container": "#ffc66d",
+                    "surface-container-highest": "#39342d",
+                    "tertiary": "#cbf2ff",
+                    "error": "#ffb4ab",
+                    "on-secondary-fixed-variant": "#144b6b",
+                    "inverse-surface": "#ebe1d7",
+                    "background": "#17130d",
+                    "on-background": "#ebe1d7",
+                    "on-surface": "#ebe1d7",
+                    "inverse-on-surface": "#353029",
+                    "error-container": "#93000a",
+                    "outline-variant": "#4f4537",
+                    "on-tertiary-container": "#006173",
+                    "surface-dim": "#17130d",
+                    "secondary-container": "#174d6e",
+                    "inverse-primary": "#805600",
+                    "primary": "#ffe9cc",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#9dccf2",
+                    "surface-container-high": "#2e2923",
+                    "on-primary-fixed": "#281800"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "1px",
+                    "margin-sm": "8px",
+                    "unit": "4px",
+                    "margin-md": "16px",
+                    "panel-padding": "12px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Inter"],
+                    "code-md": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "code-sm": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #2B2B2B; /* Brand base background */
+            color: #ebe1d7;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            font-size: 18px;
+        }
+        .panel-surface {
+            background-color: #3C3F41; /* Level 1 Panel surface */
+        }
+        .border-technical {
+            border-color: #323232;
+        }
+        .active-indicator {
+            width: 2px;
+            background-color: #FFC66D;
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface-container border-b border-outline-variant dock-top h-12 flex justify-between items-center px-panel-padding w-full z-50">
+<div class="flex items-center gap-margin-md">
+<span class="font-headline-md text-headline-md text-on-surface">DiamondLang</span>
+</div>
+<div class="flex items-center gap-margin-sm">
+<button class="material-symbols-outlined text-primary hover:bg-surface-variant p-2 rounded transition-colors" data-icon="chat_bubble">chat_bubble</button>
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-[14px]" data-icon="wifi_off">wifi_off</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Used as Horizontal Tab Strip per instructions) -->
+<nav class="bg-surface-container-low border-b border-outline-variant flex flex-row gap-margin-md px-panel-padding h-10 items-center overflow-x-auto z-40">
+<div class="flex items-center gap-2 text-on-surface-variant cursor-pointer transition-all duration-200 hover:text-on-surface pb-1">
+<span class="material-symbols-outlined" data-icon="code">code</span>
+<span class="font-label-caps text-label-caps">Lexical</span>
+</div>
+<div class="flex items-center gap-2 text-primary border-b-2 border-primary-container cursor-pointer transition-all duration-200 pb-1">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-label-caps text-label-caps">Syntactic</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant cursor-pointer transition-all duration-200 hover:text-on-surface pb-1">
+<span class="material-symbols-outlined" data-icon="grid_on">grid_on</span>
+<span class="font-label-caps text-label-caps">LL(1) Table</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant cursor-pointer transition-all duration-200 hover:text-on-surface pb-1">
+<span class="material-symbols-outlined" data-icon="list">list</span>
+<span class="font-label-caps text-label-caps">First / Follow Sets</span>
+</div>
+</nav>
+<!-- Main Workspace Container -->
+<main class="flex-1 flex flex-col overflow-hidden relative">
+<!-- OfflineBanner -->
+<div class="bg-error-container text-on-error-container px-panel-padding py-2 flex items-center gap-margin-md border-b border-outline-variant animate-pulse">
+<span class="material-symbols-outlined" data-icon="cloud_off">cloud_off</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps">Connection Lost</span>
+<span class="font-body-sm text-body-sm">The language server is offline. Real-time diagnostics are currently unavailable.</span>
+</div>
+<button class="ml-auto bg-on-error-container text-error-container px-3 py-1 font-label-caps text-label-caps rounded-sm">Reconnect</button>
+</div>
+<!-- Scrollable Content Canvas -->
+<div class="flex-1 overflow-y-auto p-margin-md space-y-margin-md">
+<section class="max-w-5xl mx-auto space-y-8">
+<div class="flex flex-col gap-1">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Global Design Tokens</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">System-wide definitions for diagnostic feedback and UI componentry.</p>
+</div>
+<!-- Status Cards Section -->
+<div class="space-y-unit">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="assignment">assignment</span>
+<h2 class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant">Diagnostic Status Cards</h2>
+</div>
+<!-- PanelCard: Success (Green) -->
+<div class="panel-surface border-technical border rounded flex overflow-hidden">
+<div class="w-1 bg-[#4CAF50]"></div>
+<div class="p-panel-padding flex-1">
+<div class="flex items-center justify-between cursor-pointer" onclick="this.parentElement.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#4CAF50]" data-icon="check_circle">check_circle</span>
+<h3 class="font-headline-md text-headline-md">Syntax and Semantics OK</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_less</span>
+</div>
+<div class="mt-2 font-body-md text-body-md text-on-surface-variant">No issues detected.</div>
+</div>
+</div>
+<!-- PanelCard: Warning (Amber) -->
+<div class="panel-surface border-technical border rounded flex overflow-hidden">
+<div class="w-1 bg-[#FFC66D]"></div>
+<div class="p-panel-padding flex-1">
+<div class="flex items-center justify-between cursor-pointer" onclick="this.parentElement.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#FFC66D]" data-icon="warning">warning</span>
+<h3 class="font-headline-md text-headline-md">Semantic Warnings (2)</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_less</span>
+</div>
+<div class="mt-2 font-body-md text-body-md text-on-surface-variant">Rule 2: Undeclared variable 'x'</div>
+</div>
+</div>
+<!-- PanelCard: Error (Red) -->
+<div class="panel-surface border-technical border rounded flex overflow-hidden">
+<div class="w-1 bg-[#FF6B6B]"></div>
+<div class="p-panel-padding flex-1">
+<div class="flex items-center justify-between cursor-pointer" onclick="this.parentElement.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#FF6B6B]" data-icon="error">error</span>
+<h3 class="font-headline-md text-headline-md">Syntax Errors (1)</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_less</span>
+</div>
+<div class="mt-2 font-body-md text-body-md text-on-surface-variant">Expected '-&gt;' but found '&lt;-' at line 12.</div>
+</div>
+</div>
+</div>
+<!-- Components Showcase -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-margin-md">
+<!-- Buttons Column -->
+<div class="panel-surface border border-technical p-panel-padding rounded space-y-margin-md">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Button Primitives</h2>
+<div class="flex flex-wrap gap-margin-sm items-center">
+<!-- Primary -->
+<button class="bg-primary-container text-on-primary-container font-label-caps text-label-caps px-4 py-2 rounded hover:opacity-90 active:scale-[0.98] transition-all">PRIMARY ACTION</button>
+<!-- Secondary -->
+<button class="border border-outline-variant text-on-surface font-label-caps text-label-caps px-4 py-2 rounded hover:bg-surface-variant transition-colors">SECONDARY</button>
+<!-- Danger -->
+<button class="bg-[#93000a] text-[#ffdad6] font-label-caps text-label-caps px-4 py-2 rounded hover:bg-[#a3000a] transition-colors">DANGER</button>
+</div>
+<div class="bg-[#2B2B2B] p-margin-sm rounded border border-technical">
+<code class="font-code-sm text-code-sm text-primary">btn-primary: #FFC66D | #281800</code>
+</div>
+</div>
+<!-- Badges & Chips Column -->
+<div class="panel-surface border border-technical p-panel-padding rounded space-y-margin-md">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Diagnostic Tags</h2>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-variant text-on-surface font-code-sm text-code-sm px-2 py-1 rounded-sm border border-outline-variant">DECL_DUPLICATED</span>
+<span class="bg-surface-variant text-on-surface font-code-sm text-code-sm px-2 py-1 rounded-sm border border-outline-variant">TYPE_MISMATCH</span>
+<span class="bg-surface-variant text-on-surface font-code-sm text-code-sm px-2 py-1 rounded-sm border border-outline-variant">UNDEFINED_SYM</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="bg-error-container text-on-error-container w-5 h-5 rounded-full flex items-center justify-center font-code-sm text-[10px]">1</span>
+<span class="font-body-sm text-body-sm">Errors</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-primary-container text-on-primary-container w-5 h-5 rounded-full flex items-center justify-center font-code-sm text-[10px]">2</span>
+<span class="font-body-sm text-body-sm">Warnings</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Color Palette Reference -->
+<div class="panel-surface border border-technical p-panel-padding rounded">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-4">Core Surface Layering</h2>
+<div class="grid grid-cols-3 gap-unit">
+<div class="bg-[#2B2B2B] h-20 flex flex-col justify-end p-2 border border-technical">
+<span class="font-code-sm text-[10px] text-on-surface-variant">LEVEL 0</span>
+<span class="font-code-sm text-code-sm text-on-surface">#2B2B2B</span>
+</div>
+<div class="bg-[#3C3F41] h-20 flex flex-col justify-end p-2 border border-technical">
+<span class="font-code-sm text-[10px] text-on-surface-variant">LEVEL 1</span>
+<span class="font-code-sm text-code-sm text-on-surface">#3C3F41</span>
+</div>
+<div class="bg-[#313335] h-20 flex flex-col justify-end p-2 border border-technical">
+<span class="font-code-sm text-[10px] text-on-surface-variant">LEVEL 2</span>
+<span class="font-code-sm text-code-sm text-on-surface">#313335</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Editor-like sidebar placeholder (Purely decorative for IDE feel) -->
+<aside class="absolute right-0 top-0 bottom-0 w-12 bg-surface-container border-l border-outline-variant flex flex-col items-center py-margin-md gap-margin-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface" data-icon="search">search</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface" data-icon="history">history</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-on-surface" data-icon="extension">extension</span>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full flex justify-between items-center px-margin-sm bg-surface-container-high border-t border-outline-variant h-6 z-50">
+<div class="flex items-center gap-margin-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant">DiamondLang v4.0 · Entrega 4</span>
+</div>
+<div class="flex items-center gap-margin-md">
+<div class="flex items-center gap-1 cursor-default hover:bg-surface-variant px-1">
+<span class="font-code-sm text-code-sm text-on-surface">Ln 1, Col 1</span>
+</div>
+<div class="flex items-center gap-1 cursor-default hover:bg-surface-variant px-1">
+<span class="font-code-sm text-code-sm text-on-surface">UTF-8</span>
+</div>
+<div class="flex items-center gap-1 cursor-default hover:bg-surface-variant px-1">
+<span class="font-code-sm text-code-sm text-on-surface">Spaces: 4</span>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for status cards
+        function togglePanel(element) {
+            const body = element.nextElementSibling;
+            const icon = element.querySelector('.material-symbols-outlined:last-child');
+            if (body.classList.contains('hidden')) {
+                body.classList.remove('hidden');
+                icon.innerText = 'expand_less';
+            } else {
+                body.classList.add('hidden');
+                icon.innerText = 'expand_more';
+            }
+        }
+    </script>
+</body></html>

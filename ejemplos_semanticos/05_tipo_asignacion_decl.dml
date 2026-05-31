@@ -1,0 +1,6 @@
+// Regla 3 — TIPO_ASIGNACION esperado en línea 5, col 12 ('x').
+// Declaración: se asigna una cadena a una variable de tipo entero.
+funcion principal()
+hacer
+    entero x <- "hola"
+fin_funcion

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DiamondLang IDE - Syntactic Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            font-size: 18px;
+        }
+        .code-editor-bg { background-color: #2B2B2B; }
+        .panel-bg { background-color: #3C3F41; }
+        .border-ide { border-color: #323232; }
+        .amber-error-bg { background-color: rgba(255, 198, 109, 0.12); }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #2B2B2B; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4E5254; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #5C5F61; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#17130d",
+                        "surface-container": "#241f19",
+                        "on-secondary-container": "#8fbee3",
+                        "error": "#ffb4ab",
+                        "inverse-primary": "#805600",
+                        "surface-tint": "#f5bd65",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#17130d",
+                        "tertiary-fixed-dim": "#7bd3ec",
+                        "surface-variant": "#39342d",
+                        "on-secondary-fixed-variant": "#144b6b",
+                        "secondary-fixed": "#cae6ff",
+                        "secondary-container": "#174d6e",
+                        "on-error": "#690005",
+                        "primary": "#ffe9cc",
+                        "secondary": "#9dccf2",
+                        "tertiary": "#cbf2ff",
+                        "on-primary-container": "#785100",
+                        "error-container": "#93000a",
+                        "tertiary-fixed": "#afecff",
+                        "primary-fixed": "#ffddaf",
+                        "primary-fixed-dim": "#f5bd65",
+                        "on-surface-variant": "#d3c4b2",
+                        "surface-container-low": "#1f1b15",
+                        "surface-container-high": "#2e2923",
+                        "secondary-fixed-dim": "#9dccf2",
+                        "outline": "#9c8f7e",
+                        "inverse-on-surface": "#353029",
+                        "on-surface": "#ebe1d7",
+                        "inverse-surface": "#ebe1d7",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "on-tertiary-container": "#006173",
+                        "on-primary-fixed": "#281800",
+                        "on-secondary": "#00344e",
+                        "surface-container-highest": "#39342d",
+                        "primary-container": "#ffc66d",
+                        "on-background": "#ebe1d7",
+                        "on-primary": "#442c00",
+                        "surface-bright": "#3e3831",
+                        "tertiary-container": "#84dcf5",
+                        "surface": "#17130d",
+                        "on-primary-fixed-variant": "#614000",
+                        "outline-variant": "#4f4537",
+                        "surface-container-lowest": "#120e08",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-tertiary": "#003641",
+                        "on-secondary-fixed": "#001e30"
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                    spacing: { "margin-md": "16px", "panel-padding": "12px", "gutter": "1px", "unit": "4px", "margin-sm": "8px" },
+                    fontFamily: {
+                        "headline-md": ["Inter"],
+                        "code-sm": ["JetBrains Mono"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "code-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "code-md": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface h-screen flex flex-col overflow-hidden font-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface-container text-primary flex justify-between items-center px-panel-padding w-full h-12 border-b border-outline-variant">
+<div class="flex items-center gap-margin-md">
+<span class="font-headline-md text-headline-md text-on-surface">DiamondLang</span>
+<div class="h-4 w-px bg-outline-variant"></div>
+<div class="flex gap-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:text-on-surface">FILE</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:text-on-surface">EDIT</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:text-on-surface">RUN</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-variant p-1 rounded transition-colors" data-icon="chat_bubble">chat_bubble</span>
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-[10px] font-bold">DL</div>
+</div>
+</header>
+<!-- SideNavBar (Tab Selection) -->
+<nav class="bg-surface-container-low flex flex-row gap-margin-md px-panel-padding h-10 items-center overflow-x-auto border-b border-outline-variant">
+<div class="flex items-center gap-2 text-on-surface-variant pb-1 hover:text-on-surface transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="code">code</span>
+<span class="font-label-caps text-label-caps">LEXICAL</span>
+</div>
+<div class="flex items-center gap-2 text-primary border-b-2 border-primary-container pb-1 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-label-caps text-label-caps">SYNTACTIC</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant pb-1 hover:text-on-surface transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="grid_on">grid_on</span>
+<span class="font-label-caps text-label-caps">LL(1) TABLE</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant pb-1 hover:text-on-surface transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="list">list</span>
+<span class="font-label-caps text-label-caps">FIRST / FOLLOW SETS</span>
+</div>
+</nav>
+<!-- Main Workspace -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Column: Editor -->
+<section class="flex-1 border-r border-ide flex flex-col min-w-0">
+<div class="flex-1 overflow-auto custom-scrollbar code-editor-bg relative font-code-md text-code-md">
+<div class="flex">
+<!-- Gutter -->
+<div class="w-10 bg-[#2B2B2B] text-[#606366] text-right pr-2 py-4 select-none flex flex-col gap-0 leading-6 border-r border-ide">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+<span class="text-primary-container material-symbols-outlined scale-75" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="text-primary-container material-symbols-outlined scale-75" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span>13</span><span>14</span><span>15</span>
+</div>
+<!-- Code Canvas -->
+<div class="flex-1 py-4 px-2 leading-6 whitespace-pre">
+<span class="text-[#CC7832]">funcion</span> factorial(entero n) <span class="text-[#CC7832]">retornar</span> entero
+<span class="text-[#CC7832]">hacer</span>
+<span class="text-[#CC7832]">si</span> n &lt;= 1 <span class="text-[#CC7832]">entonces</span>
+<span class="text-[#CC7832]">retornar</span> 1
+    <span class="text-[#CC7832]">sino</span>
+<span class="text-[#CC7832]">retornar</span> n * factorial(n - 1)
+    <span class="text-[#CC7832]">fin_si</span>
+<span class="text-[#CC7832]">fin_funcion</span>
+<span class="text-[#CC7832]">funcion</span> principal()
+<span class="text-[#CC7832]">hacer</span>
+<div class="amber-error-bg border-l-2 border-primary-container -ml-2 pl-2">    entero x &lt;- <span class="text-[#6A8759]">"hola"</span></div><div class="amber-error-bg border-l-2 border-primary-container -ml-2 pl-2"> <span class="text-[#CC7832]">si</span> x <span class="text-[#CC7832]">entonces</span></div>        escribir(x)
+    <span class="text-[#CC7832]">fin_si</span>
+<span class="text-[#CC7832]">fin_funcion</span></div>
+</div>
+</div>
+<!-- Editor Toolbar -->
+<div class="h-10 bg-surface-container-high border-t border-ide flex items-center px-panel-padding justify-between">
+<div class="flex items-center gap-margin-sm">
+<button class="bg-primary-container text-on-primary-container px-3 py-1 rounded text-label-caps font-label-caps flex items-center gap-1 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                        ANALYZE
+                    </button>
+<div class="flex items-center bg-surface-variant px-2 py-1 rounded text-on-surface-variant font-body-sm text-[11px] gap-2 border border-outline-variant cursor-pointer">
+<span>② Predictive LL(1)</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="expand_more">expand_more</span>
+</div>
+<div class="h-4 w-px bg-outline-variant mx-1"></div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant text-[11px] font-label-caps">AI SYNTAX</span>
+<div class="w-8 h-4 bg-surface-container-highest rounded-full relative cursor-pointer border border-outline">
+<div class="absolute left-0.5 top-0.5 w-2.5 h-2.5 bg-outline rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center gap-2 ml-2">
+<span class="text-on-surface-variant text-[11px] font-label-caps">AI SEMANTIC</span>
+<div class="w-8 h-4 bg-primary-container rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-2.5 h-2.5 bg-on-primary-container rounded-full"></div>
+</div>
+<span class="bg-[#6B46C1] text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">CLAUDE</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 text-on-surface-variant hover:text-on-surface cursor-pointer text-[11px] font-label-caps">
+<span class="material-symbols-outlined text-[16px]" data-icon="folder">folder</span>
+                        EXAMPLES
+                    </div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error" data-icon="close">close</span>
+</div>
+</div>
+<!-- Status Bar Mini -->
+<div class="bg-surface-container-high h-6 border-t border-ide flex items-center px-panel-padding">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Ln 11, Col 12</span>
+</div>
+</section>
+<!-- Right Column: Panels -->
+<aside class="w-1/2 flex flex-col bg-surface-container-low overflow-y-auto custom-scrollbar">
+<!-- Parse Tree Panel -->
+<div class="border-b border-ide">
+<div class="flex items-center justify-between px-panel-padding py-2 bg-surface-container-high">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="account_tree">account_tree</span>
+<span class="font-label-caps text-label-caps">PARSE TREE</span>
+</div>
+<span class="text-[10px] text-on-secondary-container bg-secondary-container px-2 py-0.5 rounded">② Predictive LL(1)</span>
+</div>
+<div class="p-panel-padding bg-background flex justify-center overflow-auto h-64">
+<!-- Fake Diagram for visual representation -->
+<div class="relative w-full h-full flex flex-col items-center pt-4">
+<div class="px-3 py-1 border border-secondary text-secondary rounded font-code-sm">Program</div>
+<div class="mt-8 flex gap-12">
+<div class="flex flex-col items-center relative">
+<div class="absolute -top-8 w-px h-8 bg-outline-variant"></div>
+<div class="px-3 py-1 border border-secondary text-secondary rounded font-code-sm">FunctionList</div>
+<div class="mt-8 px-3 py-1 border border-tertiary text-tertiary rounded font-code-sm">funcion</div>
+</div>
+<div class="flex flex-col items-center relative">
+<div class="absolute -top-8 w-px h-8 bg-outline-variant"></div>
+<div class="px-3 py-1 border border-secondary text-secondary rounded font-code-sm">Statement</div>
+<div class="mt-8 px-3 py-1 border border-tertiary text-tertiary rounded font-code-sm">entero</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Status Banner -->
+<div class="bg-primary-container/10 border-b border-primary-container/30 px-panel-padding py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-[16px]" data-icon="diamond" style="font-variation-settings: 'FILL' 1;">diamond</span>
+<span class="text-[11px] font-bold text-primary-container uppercase tracking-wider">Syntax OK, but semantic errors found</span>
+</div>
+<!-- Syntactic Errors Panel -->
+<div class="border-b border-ide">
+<div class="flex items-center justify-between px-panel-padding py-2 bg-surface-container-high cursor-pointer hover:bg-surface-variant transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error" data-icon="report">report</span>
+<span class="font-label-caps text-label-caps">SYNTATIC ERRORS (0)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Semantic Errors Panel -->
+<div class="border-b border-ide">
+<div class="flex items-center justify-between px-panel-padding py-2 bg-surface-container-high cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="error">error</span>
+<span class="font-label-caps text-label-caps">SEMANTIC ERRORS (2)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant rotate-90" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex flex-col gap-gutter bg-surface-container">
+<!-- Error Item 1 -->
+<div class="p-panel-padding bg-surface-container-low border-l-4 border-primary-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 flex items-center justify-center bg-primary-container text-on-primary-container rounded-full text-[10px] font-bold">1</span>
+<span class="bg-surface-variant border border-outline-variant text-on-surface-variant text-[10px] px-1.5 py-0.5 rounded font-code-sm">TYPE_ASSIGNMENT</span>
+<span class="text-on-surface-variant text-[11px]">line 11, col 12</span>
+</div>
+<span class="bg-[#6B46C1] text-white text-[9px] px-1.5 py-0.5 rounded font-bold">✨ AI</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface text-[12px]">
+<span class="text-primary-container font-code-md">· x</span>
+<span>Cannot assign string to a variable of type integer.</span>
+</div>
+<div class="bg-surface-container-highest p-2 rounded border border-outline-variant/30 text-[11px] text-on-surface-variant">
+<span class="text-primary-container">✨</span> The value on the right is a string but the variable is declared as integer. Change the variable type or convert the value.
+                        </div>
+</div>
+<!-- Error Item 2 -->
+<div class="p-panel-padding bg-surface-container-low border-l-4 border-primary-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 flex items-center justify-center bg-primary-container text-on-primary-container rounded-full text-[10px] font-bold">2</span>
+<span class="bg-surface-variant border border-outline-variant text-on-surface-variant text-[10px] px-1.5 py-0.5 rounded font-code-sm">TYPE_CONDITION</span>
+<span class="text-on-surface-variant text-[11px]">line 12, col 8</span>
+</div>
+<span class="bg-surface-variant text-on-surface-variant text-[9px] px-1.5 py-0.5 rounded font-bold">local</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface text-[12px]">
+<span class="text-primary-container font-code-md">· x</span>
+<span>The condition of si/mientras must be of type boolean, received integer.</span>
+</div>
+<div class="bg-surface-container-highest p-2 rounded border border-outline-variant/30 text-[11px] text-on-surface-variant">
+<span class="text-primary-container">💡</span> The condition must evaluate to true/false. Use a comparison operator (==, !=, &lt;, &gt;) or a boolean expression.
+                        </div>
+</div>
+</div>
+</div>
+<!-- Symbol Table Panel -->
+<div class="border-b border-ide">
+<div class="flex items-center justify-between px-panel-padding py-2 bg-surface-container-high cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="list_alt">list_alt</span>
+<span class="font-label-caps text-label-caps">SYMBOL TABLE (3)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant rotate-90" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-code-sm text-[12px]">
+<thead>
+<tr class="bg-surface-container-highest text-on-surface-variant border-b border-ide">
+<th class="px-3 py-1.5 font-semibold">NAME</th>
+<th class="px-3 py-1.5 font-semibold">CATEGORY</th>
+<th class="px-3 py-1.5 font-semibold">TYPE</th>
+<th class="px-3 py-1.5 font-semibold">SCOPE</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-ide">
+<tr class="bg-surface-container-low hover:bg-surface-variant">
+<td class="px-3 py-1.5 text-secondary">factorial</td>
+<td class="px-3 py-1.5 text-on-surface-variant">function</td>
+<td class="px-3 py-1.5 text-on-surface-variant">function</td>
+<td class="px-3 py-1.5 text-on-surface-variant">global</td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-variant">
+<td class="px-3 py-1.5 text-secondary">n</td>
+<td class="px-3 py-1.5 text-on-surface-variant">parameter</td>
+<td class="px-3 py-1.5 text-on-surface-variant">integer</td>
+<td class="px-3 py-1.5 text-on-surface-variant">factorial</td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-variant">
+<td class="px-3 py-1.5 text-secondary">principal</td>
+<td class="px-3 py-1.5 text-on-surface-variant">function</td>
+<td class="px-3 py-1.5 text-on-surface-variant">function</td>
+<td class="px-3 py-1.5 text-on-surface-variant">global</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</aside>
+</main>
+<!-- Bottom Stack Trace Panel (Collapsible) -->
+<footer class="bg-surface-container-high border-t border-outline-variant flex flex-col z-20">
+<div class="h-8 flex items-center justify-between px-panel-padding cursor-pointer hover:bg-surface-variant transition-colors group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="terminal">terminal</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant group-hover:text-on-surface">STACK TRACE — PREDICTIVE METHOD (248 STEPS)</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Ln 1, Col 1</span>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="expand_less">expand_less</span>
+</div>
+</div>
+</footer>
+<!-- Absolute background noise texture for IDE feel -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+<script>
+        // Simple interactivity for demonstration
+        document.querySelectorAll('.cursor-pointer').forEach(el => {
+            el.addEventListener('click', () => {
+                el.style.opacity = '0.7';
+                setTimeout(() => el.style.opacity = '1', 100);
+            });
+        });
+    </script>
+</body></html>

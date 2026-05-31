@@ -1,0 +1,12 @@
+// Regla 5 — caso VÁLIDO: el argumento entero 5 se promociona a real al
+// pasarlo al parámetro 'radio' (real). No debe reportar nada.
+funcion area(real radio) retornar real
+hacer
+    retornar 3.14 * radio * radio
+fin_funcion
+
+funcion principal() retornar real
+hacer
+    real a <- area(5)
+    retornar a
+fin_funcion

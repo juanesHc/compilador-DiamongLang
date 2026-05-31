@@ -1,0 +1,138 @@
+Gramática de DiamondLang — definición LL(1) (de tabla_ll.py)
+============================================================
+
+Símbolo inicial: programa
+ε = producción vacía
+
+programa          → declaracion programa
+                     | ε
+
+declaracion       → def_funcion
+                     | sentencia
+
+def_funcion       → funcion IDENTIFICADOR ( parametros ) tipo_retorno_opt hacer bloque fin_funcion
+
+tipo_retorno_opt  → retornar tipo
+                     | ε
+
+parametros        → param_lista
+                     | ε
+
+param_lista       → tipo IDENTIFICADOR param_lista_prima
+
+param_lista_prima → , tipo IDENTIFICADOR param_lista_prima
+                     | ε
+
+tipo              → entero
+                     | real
+                     | cadena
+                     | booleano
+                     | vacio
+
+bloque            → sentencia bloque_prima
+
+bloque_prima      → sentencia bloque_prima
+                     | ε
+
+sentencia         → decl_variable
+                     | sentencia_id
+                     | sent_si
+                     | sent_mientras
+                     | sent_para
+                     | sent_retornar
+                     | sent_escribir
+                     | sent_leer
+
+decl_variable     → tipo IDENTIFICADOR <- expresion
+
+sentencia_id      → IDENTIFICADOR sentencia_id_cola
+
+sentencia_id_cola → <- expresion
+                     | ( argumentos )
+
+asignacion        → IDENTIFICADOR <- expresion
+
+llamada_sentencia → IDENTIFICADOR ( argumentos )
+
+sent_si           → si expresion entonces bloque rama_sino fin_si
+
+rama_sino         → sino bloque
+                     | ε
+
+sent_mientras     → mientras expresion hacer bloque fin_mientras
+
+sent_para         → para IDENTIFICADOR desde expresion hasta expresion paso_opt hacer bloque fin_para
+
+paso_opt          → paso expresion
+                     | ε
+
+sent_retornar     → retornar expresion
+
+sent_escribir     → escribir ( expresion )
+
+sent_leer         → leer ( IDENTIFICADOR )
+
+expresion         → expr_or
+
+expr_or           → expr_and expr_or_prima
+
+expr_or_prima     → o expr_and expr_or_prima
+                     | ε
+
+expr_and          → expr_rel expr_and_prima
+
+expr_and_prima    → y expr_rel expr_and_prima
+                     | ε
+
+expr_rel          → expr_add expr_rel_prima
+
+expr_rel_prima    → op_rel expr_add
+                     | ε
+
+op_rel            → ==
+                     | !=
+                     | <
+                     | >
+                     | <=
+                     | >=
+
+expr_add          → expr_mul expr_add_prima
+
+expr_add_prima    → + expr_mul expr_add_prima
+                     | - expr_mul expr_add_prima
+                     | ε
+
+expr_mul          → expr_pot expr_mul_prima
+
+expr_mul_prima    → * expr_pot expr_mul_prima
+                     | / expr_pot expr_mul_prima
+                     | % expr_pot expr_mul_prima
+                     | ε
+
+expr_pot          → expr_unaria expr_pot_prima
+
+expr_pot_prima    → ** expr_pot
+                     | ε
+
+expr_unaria       → no expr_unaria
+                     | - expr_unaria
+                     | expr_primaria
+
+expr_primaria     → ENTERO
+                     | REAL
+                     | CADENA
+                     | verdadero
+                     | falso
+                     | IDENTIFICADOR sufijo_id
+                     | ( expresion )
+
+sufijo_id         → ( argumentos )
+                     | ε
+
+argumentos        → arg_lista
+                     | ε
+
+arg_lista         → expresion arg_lista_prima
+
+arg_lista_prima   → , expresion arg_lista_prima
+                     | ε

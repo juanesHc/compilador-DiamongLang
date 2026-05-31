@@ -1,0 +1,12 @@
+// ═════════════════════════════════════════════════════════
+// Ejemplo: operando faltante en una expresión
+// Errores esperados: 1 ó 2
+//   1) Tras '5 +' falta una expresión primaria (operando).
+//   2) Cascada esperable mientras el parser sincroniza.
+// ═════════════════════════════════════════════════════════
+
+funcion demo()
+hacer
+    entero x <- 5 +
+    escribir(x)
+fin_funcion

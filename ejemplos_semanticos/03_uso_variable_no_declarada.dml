@@ -1,0 +1,6 @@
+// Regla 2 — USO_NO_DECLARADO esperado en línea 5, col 14 (variable 'desconocida').
+funcion principal()
+hacer
+    entero x <- 10
+    escribir(desconocida)
+fin_funcion

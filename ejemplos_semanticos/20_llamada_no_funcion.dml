@@ -1,0 +1,9 @@
+// Regla 5 — LLAMADA_NO_FUNCION: 'x' es una variable, no una función;
+// invocarla como x(5) es error. No se valida aridad ni tipos.
+// (Se usa 'z' como segunda variable porque 'y' es palabra reservada.)
+funcion principal() retornar entero
+hacer
+    entero x <- 10
+    entero z <- x(5)
+    retornar z
+fin_funcion

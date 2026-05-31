@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>DiamondLang IDE - Assistant</title>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .ide-editor-bg { background-color: #2B2B2B; }
+        .ide-panel-bg { background-color: #3C3F41; }
+        .ide-surface-bg { background-color: #313335; }
+        .ide-border { border-color: #323232; }
+        .ide-border-highlight { border-color: #4E5254; }
+        .ide-accent { background-color: #FFC66D; color: #281800; }
+        
+        /* Custom scrollbar for technical feel */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #2B2B2B; }
+        ::-webkit-scrollbar-thumb { background: #4E5254; border-radius: 0px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5C6164; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#ebe1d7",
+                      "on-tertiary-fixed": "#001f26",
+                      "surface-variant": "#39342d",
+                      "on-primary": "#442c00",
+                      "on-background": "#ebe1d7",
+                      "secondary": "#9dccf2",
+                      "primary-fixed-dim": "#f5bd65",
+                      "on-primary-container": "#785100",
+                      "secondary-container": "#174d6e",
+                      "tertiary-fixed-dim": "#7bd3ec",
+                      "tertiary": "#cbf2ff",
+                      "primary-container": "#ffc66d",
+                      "outline": "#9c8f7e",
+                      "surface-dim": "#17130d",
+                      "tertiary-container": "#84dcf5",
+                      "surface-container-lowest": "#120e08",
+                      "surface-tint": "#f5bd65",
+                      "on-tertiary-fixed-variant": "#004e5d",
+                      "error": "#ffb4ab",
+                      "surface-container": "#241f19",
+                      "on-primary-fixed": "#281800",
+                      "on-secondary-fixed-variant": "#144b6b",
+                      "on-error": "#690005",
+                      "surface": "#17130d",
+                      "primary": "#ffe9cc",
+                      "error-container": "#93000a",
+                      "tertiary-fixed": "#afecff",
+                      "secondary-fixed-dim": "#9dccf2",
+                      "on-surface-variant": "#d3c4b2",
+                      "on-secondary": "#00344e",
+                      "primary-fixed": "#ffddaf",
+                      "on-tertiary-container": "#006173",
+                      "surface-container-high": "#2e2923",
+                      "on-error-container": "#ffdad6",
+                      "outline-variant": "#4f4537",
+                      "inverse-on-surface": "#353029",
+                      "on-surface": "#ebe1d7",
+                      "on-tertiary": "#003641",
+                      "inverse-primary": "#805600",
+                      "surface-bright": "#3e3831",
+                      "on-secondary-container": "#8fbee3",
+                      "surface-container-highest": "#39342d",
+                      "surface-container-low": "#1f1b15",
+                      "secondary-fixed": "#cae6ff",
+                      "on-secondary-fixed": "#001e30",
+                      "on-primary-fixed-variant": "#614000",
+                      "background": "#17130d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "panel-padding": "12px",
+                      "margin-md": "16px",
+                      "gutter": "1px",
+                      "margin-sm": "8px"
+              },
+              "fontFamily": {
+                      "code-md": ["JetBrains Mono"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "code-sm": ["JetBrains Mono"],
+                      "headline-md": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "headline-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface-container border-b border-outline-variant h-[48px] flex justify-between items-center px-margin-md z-30 shrink-0">
+<div class="flex items-center gap-margin-md">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">DiamondLang</span>
+<nav class="flex gap-4">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">File</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">Edit</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">Selection</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">View</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">Go</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">Run</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">Terminal</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors cursor-pointer" href="#">Help</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-primary font-body-sm text-body-sm">v4.0</span>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span>online</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-highest p-1 rounded transition-colors">chat</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-highest p-1 rounded transition-colors">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-highest p-1 rounded transition-colors">account_circle</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low border-r border-outline-variant w-[48px] flex flex-col items-center py-margin-sm h-full z-30 shrink-0">
+<div class="flex flex-col items-center gap-4 w-full">
+<div class="w-full flex items-center justify-center p-2 border-l-2 border-primary text-primary bg-surface-container-highest transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="folder">folder</span>
+</div>
+<div class="w-full flex items-center justify-center p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</div>
+<div class="w-full flex items-center justify-center p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+</div>
+<div class="w-full flex items-center justify-center p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+</div>
+<div class="w-full flex items-center justify-center p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="extension">extension</span>
+</div>
+</div>
+<div class="mt-auto flex flex-col items-center gap-4 w-full">
+<div class="w-full flex items-center justify-center p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
+</div>
+<div class="w-full flex items-center justify-center p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-150 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Workspace (Dimmed Context) -->
+<main class="flex-1 flex flex-col bg-[#2B2B2B] relative grayscale-[0.2] opacity-40">
+<!-- Tabs -->
+<div class="flex bg-surface-container border-b border-outline-variant">
+<div class="px-4 py-2 bg-[#2B2B2B] border-r border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="description">description</span>
+<span class="font-code-sm text-code-sm">Main.dl</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span>
+</div>
+</div>
+<!-- Content Area -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Editor -->
+<div class="flex-1 flex overflow-hidden border-r border-outline-variant">
+<div class="w-12 bg-surface-container-low text-on-surface-variant font-code-sm text-code-sm flex flex-col items-center pt-2 gap-1 border-r border-outline-variant">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+<span class="text-error bg-error-container/20 w-full text-center">11</span>
+<span class="text-error bg-error-container/20 w-full text-center">12</span>
+<span>13</span>
+</div>
+<div class="flex-1 font-code-md text-code-md p-2 space-y-1">
+<div class="text-on-surface-variant">import standard.lib</div>
+<div> </div>
+<div><span class="text-primary-fixed-dim">func</span> <span class="text-secondary">main</span>() {</div>
+<div class="pl-8 text-on-surface-variant">// Initialize system variables</div>
+<div class="pl-8"><span class="text-primary-fixed-dim">entero</span> count &lt;- 0</div>
+<div class="pl-8"><span class="text-primary-fixed-dim">cadena</span> msg &lt;- "System initialized"</div>
+<div> </div>
+<div class="pl-8"><span class="text-primary-fixed-dim">mientras</span> (count &lt; 10) {</div>
+<div class="pl-16">count &lt;- count + 1</div>
+<div class="pl-8">}</div>
+<div> </div>
+<div class="pl-8 bg-error-container/10 border-b border-error/30"><span class="text-primary-fixed-dim">entero</span> x &lt;- <span class="text-error-container">"hola"</span></div>
+<div class="pl-8 bg-error-container/10 border-b border-error/30"><span class="text-primary-fixed-dim">entero</span> y &lt;- <span class="text-error-container">"mundo"</span></div>
+<div>}</div>
+</div>
+</div>
+<!-- Panels -->
+<div class="w-[300px] bg-surface-container-low flex flex-col">
+<div class="p-margin-sm border-b border-outline-variant font-label-caps text-label-caps">DIAGNOSTICS</div>
+<div class="flex-1 p-margin-sm space-y-3">
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-error text-[18px]">error</span>
+<div>
+<div class="text-error font-body-sm text-body-sm font-bold">TYPE_MISMATCH</div>
+<div class="text-on-surface-variant font-code-sm text-code-sm">Line 11: Cannot assign 'cadena' to 'entero'</div>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-error text-[18px]">error</span>
+<div>
+<div class="text-error font-body-sm text-body-sm font-bold">TYPE_MISMATCH</div>
+<div class="text-on-surface-variant font-code-sm text-code-sm">Line 12: Cannot assign 'cadena' to 'entero'</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB (Bottom Right) - Also dimmed but part of the base -->
+<button class="fixed bottom-12 right-6 w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-lg z-20 cursor-pointer hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">chat</span>
+</button>
+<!-- MODAL OVERLAY (Main Focus) -->
+<div class="absolute inset-0 bg-black/60 z-40 flex items-center justify-center p-8 overflow-auto">
+<div class="w-[640px] h-[720px] bg-[#3C3F41] border border-[#4E5254] rounded-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300" id="active-assistant">
+<!-- Modal Header -->
+<header class="p-margin-md border-b border-[#323232] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container text-on-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">diamond</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md leading-none">DiamondLang Assistant</h2>
+<p class="text-on-surface-variant text-body-sm font-body-sm mt-1">Ask about your code or the compiler</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<!-- Model Selector -->
+<div class="bg-[#2B2B2B] p-[2px] rounded flex border border-[#323232]">
+<button class="px-3 py-1 text-label-caps font-label-caps rounded flex items-center gap-2 bg-[#FFC66D] text-[#281800]">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-600"></span>
+                                Claude Haiku
+                            </button>
+<button class="px-3 py-1 text-label-caps font-label-caps rounded text-on-surface-variant hover:text-on-surface transition-colors">
+                                Gemini Flash
+                            </button>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</header>
+<!-- Conversation Body -->
+<div class="flex-1 overflow-y-auto p-margin-md space-y-6 scrollbar-hide">
+<!-- User Message -->
+<div class="flex flex-col items-end">
+<div class="max-w-[85%] bg-primary-container text-on-primary-container p-3 rounded-lg rounded-tr-none shadow-sm font-body-md text-body-md">
+                            Why is line 11 of my code an error? It says I can't assign a string to an integer.
+                        </div>
+<span class="text-label-caps font-label-caps mt-1 text-on-surface-variant">You • 10:42 AM</span>
+</div>
+<!-- Assistant Message -->
+<div class="flex flex-col items-start">
+<div class="max-w-[90%] bg-[#313335] border border-[#4E5254] p-4 rounded-lg rounded-tl-none shadow-sm">
+<p class="text-on-surface font-body-md text-body-md">
+                                On line 11 you have <code class="bg-[#2B2B2B] px-1 rounded text-primary-fixed-dim font-code-sm">entero x &lt;- "hola"</code>.
+                            </p>
+<p class="text-on-surface font-body-md text-body-md mt-2">
+                                The variable <code class="font-code-sm text-secondary">x</code> is declared as <span class="font-bold text-primary-fixed-dim italic">entero</span> (integer), but the value on the right side is the string <span class="text-error-container">"hola"</span>. The DiamondLang compiler requires strict type matching for all assignments.
+                            </p>
+<div class="mt-4 flex items-center gap-2 bg-[#2B2B2B] p-2 rounded border border-[#323232]">
+<span class="material-symbols-outlined text-[16px] text-primary">info</span>
+<span class="text-code-sm font-code-sm text-on-surface-variant">Fix: Change "hola" to an integer or redeclare x as 'cadena'.</span>
+</div>
+</div>
+<div class="mt-2 flex items-center gap-1.5 px-1">
+<span class="w-2 h-2 rounded-full bg-orange-600"></span>
+<span class="text-label-caps font-label-caps text-on-surface-variant">Claude Haiku</span>
+</div>
+</div>
+<!-- User Message 2 -->
+<div class="flex flex-col items-end">
+<div class="max-w-[85%] bg-primary-container text-on-primary-container p-3 rounded-lg rounded-tr-none shadow-sm font-body-md text-body-md">
+                            What's the difference between Rule 3 and Rule 4 of the compiler?
+                        </div>
+</div>
+<!-- Assistant Message 2 -->
+<div class="flex flex-col items-start pb-4">
+<div class="max-w-[90%] bg-[#313335] border border-[#4E5254] p-4 rounded-lg rounded-tl-none shadow-sm">
+<ul class="space-y-3 text-on-surface font-body-md text-body-md">
+<li>
+<strong class="text-primary-fixed-dim">Rule 3 (TYPE_ASSIGNMENT):</strong> Validates that the type of the right-hand side expression matches the declared type of the target variable. 
+                                </li>
+<li class="pt-2 border-t border-[#4E5254]">
+<strong class="text-primary-fixed-dim">Rule 4 (TYPE_CONDITION):</strong> Requires that the condition of <code class="font-code-sm">si</code> (if) and <code class="font-code-sm">mientras</code> (while) is strictly of boolean type.
+                                </li>
+</ul>
+</div>
+<div class="mt-2 flex items-center gap-1.5 px-1">
+<span class="w-2 h-2 rounded-full bg-orange-600"></span>
+<span class="text-label-caps font-label-caps text-on-surface-variant">Claude Haiku</span>
+</div>
+</div>
+</div>
+<!-- Footer Input Area -->
+<footer class="p-margin-md border-t border-[#323232] bg-[#313335]">
+<div class="relative">
+<textarea class="w-full bg-[#2B2B2B] border border-[#4E5254] rounded p-3 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant focus:border-primary-container focus:ring-0 resize-none" placeholder="Ask something about your code..." rows="3"></textarea>
+<button class="absolute bottom-3 right-3 bg-primary-container text-on-primary-container px-4 py-1.5 rounded flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span>Send</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+<div class="flex justify-between items-center mt-3">
+<button class="text-on-surface-variant font-label-caps text-label-caps hover:text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+                            Clear conversation
+                        </button>
+<span class="text-[10px] text-[#4E5254] font-label-caps">ESC to close</span>
+</div>
+</footer>
+</div>
+<!-- FRAME 2: EMPTY STATE (Hidden by Default/Switchable) -->
+<div class="hidden w-[640px] h-[720px] bg-[#3C3F41] border border-[#4E5254] rounded-lg shadow-2xl flex flex-col overflow-hidden" id="empty-assistant">
+<header class="p-margin-md border-b border-[#323232] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container text-on-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">diamond</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md leading-none">DiamondLang Assistant</h2>
+<p class="text-on-surface-variant text-body-sm font-body-sm mt-1">Ask about your code or the compiler</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-[#2B2B2B] p-[2px] rounded flex border border-[#323232]">
+<button class="px-3 py-1 text-label-caps font-label-caps rounded text-on-surface-variant hover:text-on-surface transition-colors">
+                                Claude Haiku
+                            </button>
+<button class="px-3 py-1 text-label-caps font-label-caps rounded flex items-center gap-2 bg-[#FFC66D] text-[#281800]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                                Gemini Flash
+                            </button>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface" onclick="toggleAssistant()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</header>
+<div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
+<div class="opacity-10 mb-8 transform scale-150">
+<span class="material-symbols-outlined text-[120px] font-thin">diamond</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Ready to help</h3>
+<p class="text-on-surface-variant max-w-sm mt-2">Start a conversation to get help with your DiamondLang code, compiler rules, or syntax debugging.</p>
+<div class="mt-8 flex flex-wrap justify-center gap-3">
+<button class="bg-[#313335] border border-[#4E5254] px-4 py-2 rounded-full text-body-sm hover:bg-[#4E5254] transition-colors cursor-pointer">What is rule 3?</button>
+<button class="bg-[#313335] border border-[#4E5254] px-4 py-2 rounded-full text-body-sm hover:bg-[#4E5254] transition-colors cursor-pointer">Why did my analysis fail?</button>
+<button class="bg-[#313335] border border-[#4E5254] px-4 py-2 rounded-full text-body-sm hover:bg-[#4E5254] transition-colors cursor-pointer">How does scoping work?</button>
+</div>
+</div>
+<footer class="p-margin-md border-t border-[#323232] bg-[#313335]">
+<div class="relative">
+<textarea class="w-full bg-[#2B2B2B] border border-[#4E5254] rounded p-3 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant focus:border-primary-container focus:ring-0 resize-none" placeholder="Ask something about your code..." rows="3"></textarea>
+<button class="absolute bottom-3 right-3 bg-primary-container text-on-primary-container px-4 py-1.5 rounded flex items-center gap-2">
+<span>Send</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</footer>
+</div>
+</div>
+</div>
+<!-- Footer IDE Bar -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant h-[24px] flex justify-between items-center px-margin-sm z-30 shrink-0">
+<span class="text-on-surface-variant font-code-sm text-code-sm">DiamondLang v4.0.0-stable</span>
+<div class="flex items-center gap-4">
+<span class="text-on-surface-variant font-code-sm text-code-sm hover:text-on-surface cursor-default">LF</span>
+<span class="text-on-surface-variant font-code-sm text-code-sm hover:text-on-surface cursor-default">UTF-8</span>
+<span class="text-on-surface-variant font-code-sm text-code-sm hover:text-on-surface cursor-default">Main.dl</span>
+<span class="text-primary font-code-sm text-code-sm hover:text-on-surface cursor-default">Line 11, Col 45</span>
+</div>
+</footer>
+<script>
+        function toggleAssistant() {
+            const active = document.getElementById('active-assistant');
+            const empty = document.getElementById('empty-assistant');
+            if (active.classList.contains('hidden')) {
+                active.classList.remove('hidden');
+                empty.classList.add('hidden');
+            } else {
+                active.classList.add('hidden');
+                empty.classList.remove('hidden');
+            }
+        }
+
+        // Add a small toggle logic for demo purposes
+        document.querySelector('.bg-primary-container.fixed').addEventListener('click', toggleAssistant);
+    </script>
+</body></html>

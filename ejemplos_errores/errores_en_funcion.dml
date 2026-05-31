@@ -1,0 +1,18 @@
+// ═════════════════════════════════════════════════════════
+// Ejemplo: función con varios errores en el cuerpo
+// Errores esperados: 3
+//   1) Falta '<-' en 'entero acumulador 0'                (decl_variable)
+//   2) Falta 'hacer' después de la condición del          (sent_mientras)
+//      'mientras i < 10'.
+//   3) Falta 'fin_funcion' al final del archivo.          (def_funcion)
+// ═════════════════════════════════════════════════════════
+
+funcion sumar_hasta(entero n) retornar entero
+hacer
+    entero acumulador 0
+    entero i <- 0
+    mientras i < 10
+        acumulador <- acumulador + i
+        i <- i + 1
+    fin_mientras
+    retornar acumulador

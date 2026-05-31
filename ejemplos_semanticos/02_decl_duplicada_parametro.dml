@@ -1,0 +1,5 @@
+// Regla 1 — DECL_DUPLICADA esperada en línea 2, col 32 (segundo 'a').
+funcion sumar(entero a, entero a) retornar entero
+hacer
+    retornar a
+fin_funcion

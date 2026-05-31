@@ -1,0 +1,9 @@
+// Caso INVÁLIDO — mezcla cadena + entero.
+// "edad: " + 25 -> el operador '+' rechaza (cadena, entero): TIPO_OPERADOR
+// (lo emite el motor de tipos). El RHS queda 'ERROR', así que la
+// compatibilidad de la asignación NO reporta TIPO_ASIGNACION (cascada
+// suprimida, decisión F.10). Único error esperado: TIPO_OPERADOR.
+funcion principal()
+hacer
+    cadena s <- "edad: " + 25
+fin_funcion

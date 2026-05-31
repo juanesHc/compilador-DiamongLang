@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DiamondLang IDE - Análisis Léxico</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#84dcf5",
+                        "secondary-fixed": "#cae6ff",
+                        "surface": "#17130d",
+                        "primary-fixed": "#ffddaf",
+                        "outline": "#9c8f7e",
+                        "inverse-primary": "#805600",
+                        "surface-container-low": "#1f1b15",
+                        "on-primary-fixed": "#281800",
+                        "on-tertiary": "#003641",
+                        "secondary-fixed-dim": "#9dccf2",
+                        "on-primary-fixed-variant": "#614000",
+                        "primary-container": "#ffc66d",
+                        "outline-variant": "#4f4537",
+                        "surface-container-lowest": "#120e08",
+                        "inverse-surface": "#ebe1d7",
+                        "surface-container-high": "#2e2923",
+                        "surface-container": "#241f19",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "tertiary-fixed-dim": "#7bd3ec",
+                        "on-tertiary-fixed": "#001f26",
+                        "secondary": "#9dccf2",
+                        "on-secondary": "#00344e",
+                        "tertiary": "#cbf2ff",
+                        "surface-dim": "#17130d",
+                        "on-surface-variant": "#d3c4b2",
+                        "on-secondary-container": "#8fbee3",
+                        "surface-bright": "#3e3831",
+                        "on-primary": "#442c00",
+                        "secondary-container": "#174d6e",
+                        "on-tertiary-container": "#006173",
+                        "background": "#17130d",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#afecff",
+                        "primary": "#ffe9cc",
+                        "on-secondary-fixed-variant": "#144b6b",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#39342d",
+                        "on-background": "#ebe1d7",
+                        "on-primary-container": "#785100",
+                        "surface-container-highest": "#39342d",
+                        "on-surface": "#ebe1d7",
+                        "primary-fixed-dim": "#f5bd65",
+                        "inverse-on-surface": "#353029",
+                        "on-secondary-fixed": "#001e30",
+                        "surface-tint": "#f5bd65",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "ide-bg": "#2B2B2B",
+                        "ide-panel": "#3C3F41",
+                        "ide-border": "#323232",
+                        "syntax-keyword": "#CC7832",
+                        "syntax-number": "#6897BB",
+                        "syntax-id": "#A9B7C6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-sm": "8px",
+                        "margin-md": "16px",
+                        "gutter": "1px",
+                        "panel-padding": "12px",
+                        "toolbar-height": "48px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            font-size: 18px;
+        }
+        body {
+            background-color: #17130d;
+            color: #ebe1d7;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2B2B2B;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4E5254;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #5E6264;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding h-toolbar-height bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<svg class="w-6 h-6 text-primary" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12.14 2.14L3 12l9.14 9.86L21 12l-8.86-9.86zM12 18.23L5.31 12 12 5.77 18.69 12 12 18.23z"></path>
+</svg>
+<span class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter">DiamondLang</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded border border-outline-variant">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Servidor activo</span>
+</div>
+</div>
+<nav class="flex gap-1 h-full items-center">
+<button class="px-4 h-full flex items-center gap-2 text-primary border-b-2 border-primary bg-primary/10 font-label-caps text-label-caps">
+            Léxico
+        </button>
+<button class="px-4 h-full flex items-center gap-2 text-on-surface-variant hover:bg-surface-variant transition-colors font-label-caps text-label-caps">
+            Sintáctico
+        </button>
+<button class="px-4 h-full flex items-center gap-2 text-on-surface-variant hover:bg-surface-variant transition-colors font-label-caps text-label-caps">
+            Tabla LL(1)
+        </button>
+<button class="px-4 h-full flex items-center gap-2 text-on-surface-variant hover:bg-surface-variant transition-colors font-label-caps text-label-caps">
+            PRIMERO / SIGUIENTE
+        </button>
+</nav>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant transition-colors rounded">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant transition-colors rounded">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-outline-variant overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyMdgNKj9_RNyznfiTx40YZMwfX4CmaGearDD-QeJYzUqxv4y1En45TPl8uykn2wRQUwbBFipjsQcJwvR98CXOynyZ4UZGLjercS65fslswCnHS0nsRQ5tVCqhhiC6kd3vbqY4xT0mEFswEcgbbk1Ez0JYcpxu-HZz_sqeBVKE2sEdO6pD6Bb15pBbS20wJF_aUcWyImM45aK8rAKOWNPlMv-KCLBBt-hyRRJz-0vpLFrYmclzM_Jc6UOwudG1wiTayfNlVjdAYg"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 mt-toolbar-height mb-10 p-4 grid grid-cols-2 grid-rows-[minmax(0,3fr),minmax(0,2fr)] gap-4 overflow-hidden">
+<!-- TOP-LEFT: Editor Panel -->
+<section class="bg-ide-panel rounded border border-ide-border flex flex-col overflow-hidden shadow-sm group hover:border-primary/20 transition-colors">
+<div class="h-10 px-4 bg-[#323232] border-b border-ide-border flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-syntax-keyword" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polyline>
+<line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="16" x2="8" y1="13" y2="13"></line>
+<line stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="16" x2="8" y1="17" y2="17"></line>
+<polyline points="10 9 9 9 8 9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polyline>
+</svg>
+<span class="text-body-sm font-semibold tracking-tight uppercase text-on-surface-variant">Editor — DiamondLang</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant/60">Línea 12, Columna 8</span>
+</div>
+<div class="flex-1 flex overflow-hidden">
+<div class="w-12 bg-[#2B2B2B] border-r border-ide-border text-right px-2 py-4 font-code-sm text-code-sm text-[#606366] flex flex-col gap-0.5 select-none">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<div class="flex-1 p-4 font-code-md text-code-md overflow-auto custom-scrollbar whitespace-pre text-[#A9B7C6] bg-[#2B2B2B] outline-none" contenteditable="true">
+<span class="text-syntax-keyword">funcion</span> <span class="text-syntax-id">factorial</span>(<span class="text-syntax-keyword">entero</span> <span class="text-syntax-id">n</span>) <span class="text-syntax-keyword">retornar</span> <span class="text-syntax-keyword">entero</span>
+<span class="text-syntax-keyword">hacer</span>
+<span class="text-syntax-keyword">si</span> <span class="text-syntax-id">n</span> &lt;= <span class="text-syntax-number">1</span> <span class="text-syntax-keyword">entonces</span>
+<span class="text-syntax-keyword">retornar</span> <span class="text-syntax-number">1</span>
+<span class="text-syntax-keyword">sino</span>
+<span class="text-syntax-keyword">retornar</span> <span class="text-syntax-id">n</span> * <span class="text-syntax-id">factorial</span>(<span class="text-syntax-id">n</span> - <span class="text-syntax-number">1</span>)
+    <span class="text-syntax-keyword">fin_si</span>
+<span class="text-syntax-keyword">fin_funcion</span></div>
+</div>
+<div class="h-12 px-3 border-t border-ide-border flex items-center justify-between shrink-0 bg-[#3C3F41]">
+<div class="flex items-center gap-2">
+<button class="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-sm font-label-caps text-label-caps flex items-center gap-2 hover:brightness-110 transition-all active:scale-[0.98]">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8 5v14l11-7z"></path>
+</svg>
+                    ANALIZAR LÉXICO
+                </button>
+<div class="relative group/dropdown">
+<button class="border border-ide-border px-3 py-1.5 rounded-sm font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-variant transition-all text-on-surface-variant">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                        EJEMPLOS
+                        <span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+<div class="absolute bottom-full left-0 mb-1 w-48 bg-surface-container-high border border-outline-variant rounded shadow-xl hidden group-hover/dropdown:block z-50">
+<div class="py-1">
+<button class="w-full text-left px-4 py-2 text-body-sm hover:bg-surface-variant transition-colors">Hola mundo</button>
+<button class="w-full text-left px-4 py-2 text-body-sm hover:bg-surface-variant transition-colors">Factorial</button>
+<button class="w-full text-left px-4 py-2 text-body-sm hover:bg-surface-variant transition-colors">Fibonacci</button>
+<button class="w-full text-left px-4 py-2 text-body-sm hover:bg-surface-variant border-t border-outline-variant/30 text-error">Con errores léxicos</button>
+</div>
+</div>
+</div>
+</div>
+<button class="p-2 hover:bg-surface-variant rounded transition-all text-on-surface-variant flex items-center gap-2 group/clear">
+<span class="text-label-caps font-label-caps opacity-0 group-hover/clear:opacity-100 transition-opacity">Limpiar</span>
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</section>
+<!-- TOP-RIGHT: Tokens Panel -->
+<section class="bg-ide-panel rounded border border-ide-border flex flex-col overflow-hidden shadow-sm group hover:border-primary/20 transition-colors">
+<div class="h-10 px-4 bg-[#323232] border-b border-ide-border flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-body-sm font-semibold tracking-tight uppercase text-on-surface-variant">Tokens</span>
+</div>
+<span class="bg-[#2B2B2B] text-[10px] px-2 py-0.5 rounded-full border border-ide-border font-bold text-secondary">128 TOKENS</span>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar p-4 space-y-4 bg-[#2B2B2B]">
+<div class="flex items-start gap-4">
+<span class="font-code-sm text-code-sm text-[#606366] w-4 mt-1">1</span>
+<div class="flex flex-wrap gap-2">
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">funcion</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">factorial</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500">(</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">entero</span>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="font-code-sm text-code-sm text-[#606366] w-4 mt-1">2</span>
+<div class="flex flex-wrap gap-2">
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">hacer</span>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="font-code-sm text-code-sm text-[#606366] w-4 mt-1">3</span>
+<div class="flex flex-wrap gap-2">
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">si</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">n</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-rose-400/30 bg-rose-400/10 text-rose-400">&lt;=</span>
+<span class="font-code-sm px-2 py-0.5 rounded border border-[#6897BB]/30 bg-[#6897BB]/10 text-[#6897BB]">1</span>
+</div>
+</div>
+</div>
+<div class="h-12 px-4 border-t border-ide-border flex items-center gap-4 shrink-0 bg-[#3C3F41] overflow-x-auto no-scrollbar">
+<span class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mr-2">Leyenda</span>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-[#CC7832] rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">PALABRA CLAVE</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-slate-400 rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">ID</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-[#6897BB] rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">NÚMERO</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-rose-400 rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">OPERADOR</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="w-2.5 h-2.5 bg-red-500 rounded-sm"></span>
+<span class="text-[9px] font-bold text-on-surface-variant">ERROR</span>
+</div>
+</div>
+</section>
+<!-- BOTTOM: Symbol Table Panel -->
+<section class="bg-ide-panel rounded border border-ide-border flex flex-col col-span-2 overflow-hidden shadow-sm group hover:border-primary/20 transition-colors">
+<div class="h-10 px-4 bg-[#323232] border-b border-ide-border flex justify-between items-center shrink-0">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-tertiary-fixed-dim" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-body-sm font-semibold tracking-tight uppercase text-on-surface-variant">Tabla de símbolos</span>
+</div>
+<span class="text-body-sm text-on-surface-variant/60">32 Entradas</span>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar bg-[#2B2B2B]">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-[#323232] shadow-sm z-10">
+<tr class="text-label-caps font-label-caps text-on-surface-variant border-b border-ide-border">
+<th class="px-6 py-3 font-medium w-16">#</th>
+<th class="px-6 py-3 font-medium">Lexema</th>
+<th class="px-6 py-3 font-medium">Tipo de token</th>
+<th class="px-6 py-3 font-medium w-32 text-center">Línea</th>
+<th class="px-6 py-3 font-medium w-32 text-center">Columna</th>
+</tr>
+</thead>
+<tbody class="font-code-sm text-code-sm">
+<tr class="border-b border-ide-border/30 hover:bg-[#323232] transition-colors">
+<td class="px-6 py-3 text-[#606366]">001</td>
+<td class="px-6 py-3 font-medium">funcion</td>
+<td class="px-6 py-3">
+<span class="px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">PALABRA CLAVE</span>
+</td>
+<td class="px-6 py-3 text-center">1</td>
+<td class="px-6 py-3 text-center">1</td>
+</tr>
+<tr class="border-b border-ide-border/30 hover:bg-[#323232] transition-colors">
+<td class="px-6 py-3 text-[#606366]">002</td>
+<td class="px-6 py-3 font-medium">factorial</td>
+<td class="px-6 py-3">
+<span class="px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">ID</span>
+</td>
+<td class="px-6 py-3 text-center">1</td>
+<td class="px-6 py-3 text-center">9</td>
+</tr>
+<tr class="border-b border-ide-border/30 hover:bg-[#323232] transition-colors">
+<td class="px-6 py-3 text-[#606366]">003</td>
+<td class="px-6 py-3 font-medium">entero</td>
+<td class="px-6 py-3">
+<span class="px-2 py-0.5 rounded border border-[#CC7832]/30 bg-[#CC7832]/10 text-[#CC7832]">TIPO</span>
+</td>
+<td class="px-6 py-3 text-center">1</td>
+<td class="px-6 py-3 text-center">20</td>
+</tr>
+<tr class="border-b border-ide-border/30 hover:bg-[#323232] transition-colors">
+<td class="px-6 py-3 text-[#606366]">004</td>
+<td class="px-6 py-3 font-medium">n</td>
+<td class="px-6 py-3">
+<span class="px-2 py-0.5 rounded border border-slate-500/30 bg-slate-500/10 text-slate-300">ID</span>
+</td>
+<td class="px-6 py-3 text-center">1</td>
+<td class="px-6 py-3 text-center">27</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="h-9 px-6 border-t border-ide-border flex items-center bg-[#3C3F41] shrink-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant/80 tracking-tight">
+                Total: 128 · Palabras clave: 18 · Identificadores: 32 · Errores: 0
+            </span>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full flex justify-between items-center px-6 py-2.5 z-50 bg-surface-container-lowest border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant/70 uppercase tracking-widest">© 2024 DiamondLang Foundation</span>
+</div>
+<div class="flex gap-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacidad</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Seguridad</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Términos</a>
+</div>
+</footer>
+</body></html>

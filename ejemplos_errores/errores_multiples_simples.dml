@@ -1,0 +1,14 @@
+// ═════════════════════════════════════════════════════════
+// Ejemplo: errores múltiples simples
+// Errores esperados: 3
+//   1) Falta '<-' en la declaración 'entero x 10'           (decl_variable)
+//   2) Falta 'entonces' después de la condición del 'si'    (sent_si)
+//   3) Falta 'fin_si' al cerrar el bloque condicional       (sent_si)
+// ═════════════════════════════════════════════════════════
+
+funcion principal()
+hacer
+    entero x 10
+    si x > 5
+        escribir(x)
+fin_funcion

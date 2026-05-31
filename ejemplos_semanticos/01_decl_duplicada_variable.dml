@@ -1,0 +1,7 @@
+// Regla 1 — DECL_DUPLICADA esperada en línea 5, col 12 (segundo 'x').
+funcion principal()
+hacer
+    entero x <- 10
+    entero x <- 20
+    escribir(x)
+fin_funcion

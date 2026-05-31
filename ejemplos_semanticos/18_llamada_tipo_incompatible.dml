@@ -1,0 +1,12 @@
+// Regla 5 — LLAMADA_TIPO: el argumento 1 de 'saludar' debe ser cadena,
+// se recibió entero (42).
+funcion saludar(cadena nombre) retornar vacio
+hacer
+    escribir(nombre)
+fin_funcion
+
+funcion principal() retornar entero
+hacer
+    saludar(42)
+    retornar 0
+fin_funcion

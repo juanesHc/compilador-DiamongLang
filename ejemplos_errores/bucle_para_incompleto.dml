@@ -1,0 +1,14 @@
+// ═════════════════════════════════════════════════════════
+// Ejemplo: bucle 'para' incompleto
+// Errores esperados: 1
+//   1) Falta 'hasta <expresion>' entre 'desde 1' y 'hacer'.
+//      (sent_para)
+// ═════════════════════════════════════════════════════════
+
+funcion contar()
+hacer
+    entero i <- 0
+    para i desde 1 hacer
+        escribir(i)
+    fin_para
+fin_funcion

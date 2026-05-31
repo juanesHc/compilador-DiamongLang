@@ -1,0 +1,7 @@
+// Caso VÁLIDO — concatenación de cadenas con '+'.
+// "hola " + "mundo" -> cadena, compatible con la variable cadena.
+// No debe reportar ningún error semántico.
+funcion principal()
+hacer
+    cadena s <- "hola " + "mundo"
+fin_funcion

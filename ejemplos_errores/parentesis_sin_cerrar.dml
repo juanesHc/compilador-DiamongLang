@@ -1,0 +1,16 @@
+// ═════════════════════════════════════════════════════════
+// Ejemplo: paréntesis sin cerrar
+// Errores esperados: 1 ó 2
+//   1) Falta el ')' que cierra la llamada a 'escribir'.
+//   (puede aparecer también un error secundario por la
+//    expresión inacabada antes de 'fin_funcion'.)
+// ═════════════════════════════════════════════════════════
+
+funcion demo()
+hacer
+    entero a <- 1
+    entero b <- 2
+    entero c <- 3
+    entero d <- 4
+    escribir(a + b * (c - d)
+fin_funcion

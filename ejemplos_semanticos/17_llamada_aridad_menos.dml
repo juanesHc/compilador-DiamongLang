@@ -1,0 +1,11 @@
+// Regla 5 — LLAMADA_ARIDAD: 'sumar' espera 2 argumentos, recibe 1.
+funcion sumar(entero a, entero b) retornar entero
+hacer
+    retornar a + b
+fin_funcion
+
+funcion principal() retornar entero
+hacer
+    entero r <- sumar(1)
+    retornar r
+fin_funcion

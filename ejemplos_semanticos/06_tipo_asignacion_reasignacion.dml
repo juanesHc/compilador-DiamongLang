@@ -1,0 +1,7 @@
+// Regla 3 — TIPO_ASIGNACION esperado en línea 6, col 5 (reasignación de 'x').
+// 'x' se declara entero y luego se le asigna una cadena.
+funcion principal()
+hacer
+    entero x <- 10
+    x <- "ahora soy cadena"
+fin_funcion

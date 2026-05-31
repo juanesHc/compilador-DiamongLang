@@ -1,0 +1,9 @@
+// Regla 4 — TIPO_CONDICION: la condicion de 'mientras' es cadena, no booleano.
+// Se ancla en el primer terminal de la condicion ('s').
+funcion principal()
+hacer
+    cadena s <- "loop"
+    mientras s hacer
+        escribir(s)
+    fin_mientras
+fin_funcion

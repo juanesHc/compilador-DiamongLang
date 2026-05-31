@@ -1,0 +1,10 @@
+// Caso VALIDO — condicion compuesta con operador logico: (x > 3) y flag.
+// (x > 3) es booleano, flag es booleano, 'y' -> booleano. No reporta.
+funcion principal()
+hacer
+    entero x <- 5
+    booleano flag <- verdadero
+    si x > 3 y flag entonces
+        escribir("ambas")
+    fin_si
+fin_funcion

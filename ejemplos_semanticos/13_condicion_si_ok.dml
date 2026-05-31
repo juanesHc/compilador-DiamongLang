@@ -1,0 +1,11 @@
+// Caso VALIDO — condicion de 'si' con comparacion: x > 3 -> booleano.
+// No debe reportar ningun error semantico.
+funcion principal()
+hacer
+    entero x <- 5
+    si x > 3 entonces
+        escribir("mayor")
+    sino
+        escribir("menor o igual")
+    fin_si
+fin_funcion

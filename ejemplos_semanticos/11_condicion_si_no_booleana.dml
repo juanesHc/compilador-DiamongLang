@@ -1,0 +1,9 @@
+// Regla 4 — TIPO_CONDICION: la condicion de 'si' es entero, no booleano.
+// Se ancla en el primer terminal de la condicion ('x').
+funcion principal()
+hacer
+    entero x <- 5
+    si x entonces
+        escribir("hola")
+    fin_si
+fin_funcion

@@ -1,0 +1,10 @@
+// Regla 5 — caso VÁLIDO: recursión con aridad y tipos correctos.
+// 'factorial' espera 1 entero y se invoca con (n - 1), también entero.
+funcion factorial(entero n) retornar entero
+hacer
+    si n <= 1 entonces
+        retornar 1
+    sino
+        retornar n * factorial(n - 1)
+    fin_si
+fin_funcion

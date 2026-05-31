@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DiamondLang IDE - Syntactic Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .diamond-grid {
+            background-image: radial-gradient(circle at 1px 1px, rgba(188, 199, 222, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+            transform: rotate(45deg);
+        }
+        .code-editor {
+            counter-reset: line;
+        }
+        .code-line::before {
+            counter-increment: line;
+            content: counter(line);
+            display: inline-block;
+            width: 2rem;
+            margin-right: 1rem;
+            text-align: right;
+            color: #45474c;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .panel-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "surface": "#0b1326",
+                "background": "#0b1326",
+                "secondary-container": "#29a195",
+                "surface-variant": "#2d3449",
+                "on-background": "#dae2fd",
+                "on-tertiary": "#003824",
+                "surface-container-low": "#131b2e",
+                "surface-container-high": "#222a3d",
+                "on-tertiary-fixed": "#002113",
+                "outline": "#8f9097",
+                "primary-container": "#1e293b",
+                "surface-tint": "#bcc7de",
+                "on-primary": "#263143",
+                "on-secondary-container": "#00302b",
+                "on-error": "#690005",
+                "on-surface": "#dae2fd",
+                "inverse-primary": "#545f73",
+                "on-secondary-fixed": "#00201d",
+                "surface-container-highest": "#2d3449",
+                "on-secondary": "#003732",
+                "error": "#ffb4ab",
+                "error-container": "#93000a",
+                "on-tertiary-fixed-variant": "#005236",
+                "on-tertiary-container": "#00a472",
+                "inverse-on-surface": "#283044",
+                "tertiary-container": "#00301e",
+                "secondary-fixed": "#89f5e7",
+                "on-primary-container": "#8590a6",
+                "surface-dim": "#0b1326",
+                "tertiary": "#4edea3",
+                "tertiary-fixed-dim": "#4edea3",
+                "inverse-surface": "#dae2fd",
+                "surface-bright": "#31394d",
+                "secondary-fixed-dim": "#6bd8cb",
+                "surface-container-lowest": "#060e20",
+                "primary-fixed": "#d8e3fb",
+                "on-primary-fixed": "#111c2d",
+                "on-error-container": "#ffdad6",
+                "surface-container": "#171f33",
+                "outline-variant": "#45474c",
+                "on-primary-fixed-variant": "#3c475a",
+                "secondary": "#6bd8cb",
+                "primary": "#bcc7de",
+                "on-secondary-fixed-variant": "#005049",
+                "on-surface-variant": "#c5c6cd",
+                "primary-fixed-dim": "#bcc7de",
+                "tertiary-fixed": "#6ffbbe"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "panel-gap": "1px",
+                "container-padding": "1rem",
+                "toolbar-height": "48px",
+                "sidebar-width": "260px",
+                "element-gap": "0.5rem"
+              },
+              "fontFamily": {
+                "headline-lg": ["Geist"],
+                "code-sm": ["JetBrains Mono"],
+                "label-caps": ["Geist"],
+                "body-md": ["Geist"],
+                "body-sm": ["Geist"],
+                "headline-md": ["Geist"],
+                "code-lg": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                "code-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+                "label-caps": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                "code-lg": ["14px", { "lineHeight": "22px", "fontWeight": "400" }]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar Execution -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding h-toolbar-height bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<span class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter">DiamondLang</span>
+<span class="bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-widest">v4.0</span>
+</div>
+<div class="hidden md:flex gap-6 items-center">
+<nav class="flex gap-4">
+<a class="text-on-surface-variant font-medium hover:bg-surface-variant transition-colors px-2 py-1 rounded" href="#">Docs</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-variant transition-colors px-2 py-1 rounded" href="#">Specs</a>
+<a class="text-on-surface-variant font-medium hover:bg-surface-variant transition-colors px-2 py-1 rounded" href="#">Playground</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Server active</span>
+</div>
+<button class="material-symbols-outlined text-primary hover:bg-surface-variant p-2 rounded transition-colors" data-icon="chat">chat</button>
+<button class="material-symbols-outlined text-primary hover:bg-surface-variant p-2 rounded transition-colors" data-icon="settings">settings</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-[48px] flex flex-col">
+<!-- Tab Bar -->
+<div class="bg-surface-container-low border-b border-outline-variant flex px-4 h-10 items-end">
+<button class="px-4 py-2 text-on-surface-variant font-medium text-body-sm hover:text-on-surface">Lexical</button>
+<button class="px-4 py-2 text-tertiary font-bold border-b-2 border-tertiary text-body-sm">Syntactic</button>
+<button class="px-4 py-2 text-on-surface-variant font-medium text-body-sm hover:text-on-surface">LL(1) Table</button>
+<button class="px-4 py-2 text-on-surface-variant font-medium text-body-sm hover:text-on-surface">First / Follow</button>
+</div>
+<!-- Workspace (2-column split) -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Column: Editor (55%) -->
+<div class="w-[55%] flex flex-col border-r border-outline-variant bg-surface">
+<!-- Editor Toolbar -->
+<div class="h-10 px-4 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-2 py-1 hover:bg-surface-variant rounded text-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="folder">folder</span>
+<span class="font-label-caps text-label-caps">Examples</span>
+</button>
+<div class="h-4 w-[1px] bg-outline-variant mx-1"></div>
+<button class="flex items-center gap-1.5 px-2 py-1 hover:bg-surface-variant rounded text-on-surface-variant transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="bug_report">bug_report</span>
+<span class="font-label-caps text-label-caps">Semantic error examples</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="bg-secondary text-on-secondary font-bold font-label-caps text-label-caps px-4 py-1.5 rounded flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px] font-bold" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            Analyze
+                        </button>
+<button class="p-1.5 hover:bg-error-container hover:text-on-error-container rounded transition-colors text-on-surface-variant" title="Clear">
+<span class="material-symbols-outlined text-[18px]" data-icon="delete_sweep">delete_sweep</span>
+</button>
+</div>
+</div>
+<!-- Editor Surface -->
+<div class="flex-1 font-code-lg text-code-lg p-4 overflow-auto bg-surface-container-lowest code-editor">
+<div class="code-line"><span class="text-primary">funcion</span> <span class="text-secondary">calcular</span>(<span class="text-secondary">entero</span> x) {</div>
+<div class="code-line">  <span class="text-primary">si</span> (x &gt; 0) <span class="text-primary">entonces</span> {</div>
+<div class="code-line">    <span class="text-primary">retornar</span> x * 2;</div>
+<div class="code-line">  } <span class="text-primary">sino</span> {</div>
+<div class="code-line">    <span class="text-primary">retornar</span> 0;</div>
+<div class="code-line">  }</div>
+<div class="code-line">}</div>
+</div>
+<!-- Status Bar -->
+<div class="h-6 px-4 bg-surface-container-high border-t border-outline-variant flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Ln 12, Col 8</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">DiamondLang (v4)</span>
+</div>
+</div>
+<!-- Right Column: Diagnostics (45%) -->
+<div class="w-[45%] flex flex-col bg-surface-container-low overflow-y-auto scrollbar-hide">
+<!-- Status Banner -->
+<div class="m-4 p-3 bg-tertiary-container border border-tertiary/20 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-tertiary font-bold font-label-caps text-label-caps">Syntax and semantics OK</span>
+</div>
+<div class="px-4 flex flex-col gap-4 pb-8">
+<!-- Parse Tree Preview -->
+<div class="bg-surface border border-outline-variant rounded overflow-hidden">
+<button class="w-full flex items-center justify-between p-3 bg-surface-container hover:bg-surface-variant transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="account_tree">account_tree</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant">Parse Tree Preview (1)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="keyboard_arrow_up">keyboard_arrow_up</span>
+</button>
+<div class="p-6 flex justify-center items-center bg-surface-container-lowest min-h-[200px]">
+<div class="relative w-full h-40 border border-dashed border-outline-variant rounded flex items-center justify-center">
+<!-- Abstract visual representation -->
+<div class="text-on-surface-variant font-code-sm flex flex-col items-center opacity-40">
+<span class="material-symbols-outlined text-4xl mb-2" data-icon="schema">schema</span>
+<span>Sketchy Tree Visualization</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Syntactic Errors -->
+<div class="bg-surface border border-outline-variant rounded overflow-hidden">
+<button class="w-full flex items-center justify-between p-3 bg-surface-container hover:bg-surface-variant transition-colors border-l-4 border-error" onclick="this.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error" data-icon="error_outline">error_outline</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-error">Syntactic Errors (0)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+<div class="p-4 hidden text-on-surface-variant text-body-sm italic">
+                            No syntactic errors detected.
+                        </div>
+</div>
+<!-- Semantic Errors -->
+<div class="bg-surface border border-outline-variant rounded overflow-hidden">
+<button class="w-full flex items-center justify-between p-3 bg-surface-container hover:bg-surface-variant transition-colors border-l-4 border-amber-500" onclick="this.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500" data-icon="warning">warning</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-amber-500">Semantic Errors (0)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+<div class="p-4 hidden">
+<div class="flex items-center justify-between p-2 bg-surface-variant rounded mb-2">
+<span class="text-body-sm">Redeclaration of variable 'x'</span>
+<span class="bg-error-container text-on-error-container text-[10px] px-2 py-0.5 rounded font-bold">DECL_DUPLICATED</span>
+</div>
+</div>
+</div>
+<!-- Symbol Table -->
+<div class="bg-surface border border-outline-variant rounded overflow-hidden">
+<button class="w-full flex items-center justify-between p-3 bg-surface-container hover:bg-surface-variant transition-colors border-l-4 border-secondary" onclick="this.nextElementSibling.classList.toggle('hidden')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="list_alt">list_alt</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-secondary">Symbol Table (5)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="keyboard_arrow_up">keyboard_arrow_up</span>
+</button>
+<div class="p-0">
+<table class="w-full text-left font-code-sm text-code-sm border-collapse">
+<thead class="bg-surface-container-high text-on-surface-variant">
+<tr>
+<th class="p-2 border-b border-outline-variant">Name</th>
+<th class="p-2 border-b border-outline-variant">Category</th>
+<th class="p-2 border-b border-outline-variant">Type</th>
+<th class="p-2 border-b border-outline-variant">Scope</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-variant/40">
+<td class="p-2 text-secondary">calcular</td>
+<td class="p-2">Function</td>
+<td class="p-2">entero</td>
+<td class="p-2">Global</td>
+</tr>
+<tr class="hover:bg-surface-variant/40">
+<td class="p-2 text-on-surface">x</td>
+<td class="p-2">Param</td>
+<td class="p-2">entero</td>
+<td class="p-2">calcular</td>
+</tr>
+<tr class="hover:bg-surface-variant/40">
+<td class="p-2 text-on-surface">retorno</td>
+<td class="p-2">Internal</td>
+<td class="p-2">entero</td>
+<td class="p-2">calcular</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-6 right-6 w-14 h-14 bg-secondary text-on-secondary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40 group" id="chatFab" onclick="document.getElementById('chatModal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform" data-icon="chat" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+<!-- Chatbot Modal -->
+<div class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" id="chatModal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm" onclick="document.getElementById('chatModal').classList.add('hidden')"></div>
+<!-- Modal Content -->
+<div class="relative w-full max-w-2xl bg-surface-container-low border border-outline-variant shadow-2xl rounded-xl flex flex-col max-h-[819px] overflow-hidden">
+<!-- Header -->
+<header class="p-4 border-b border-outline-variant flex items-center justify-between bg-surface-container">
+<div class="flex flex-col">
+<h2 class="font-headline-md text-headline-md text-primary">DiamondLang Assistant</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ask about your code</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-container-highest rounded p-1">
+<button class="px-3 py-1 bg-secondary text-on-secondary text-[11px] font-bold rounded">Claude Haiku</button>
+<button class="px-3 py-1 text-on-surface-variant text-[11px] font-bold hover:text-on-surface transition-colors">Gemini Flash</button>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors" data-icon="close" onclick="document.getElementById('chatModal').classList.add('hidden')">close</button>
+</div>
+</header>
+<!-- Chat Body -->
+<div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 scrollbar-hide">
+<!-- User Message -->
+<div class="flex justify-end">
+<div class="max-w-[80%] bg-primary-container text-on-surface p-3 rounded-2xl rounded-tr-none border border-outline-variant/30">
+<p class="text-body-md">How do I fix a TYPE_ASSIGNMENT error?</p>
+</div>
+</div>
+<!-- Assistant Message -->
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm text-on-secondary-container" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="max-w-[85%] flex flex-col gap-2">
+<div class="bg-surface-variant p-3 rounded-2xl rounded-tl-none border border-outline-variant/30">
+<p class="text-body-md leading-relaxed text-on-surface">A <code class="bg-surface p-0.5 rounded text-secondary">TYPE_ASSIGNMENT</code> error occurs when you try to assign a value to a variable of a different type. In DiamondLang, check that your variables are declared as 'entero', 'real', etc. correctly.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-secondary tracking-widest uppercase">Claude Haiku</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-[10px] text-on-surface-variant uppercase">Just now</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Footer -->
+<footer class="p-4 bg-surface border-t border-outline-variant">
+<div class="flex flex-col gap-3">
+<textarea class="w-full bg-surface-container-highest border border-outline-variant rounded-lg p-3 text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary resize-none placeholder-on-surface-variant/50" placeholder="Ask something about your code..." rows="3"></textarea>
+<div class="flex items-center justify-between">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors font-label-caps text-label-caps px-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="delete_forever">delete_forever</span>
+                            Clear conversation
+                        </button>
+<button class="bg-secondary text-on-secondary font-bold font-label-caps text-label-caps px-6 py-2 rounded flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md shadow-secondary/20">
+                            Send
+                            <span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+</div>
+<!-- Footer Execution -->
+<footer class="fixed bottom-0 left-0 w-full flex justify-between items-center px-4 py-2 z-30 bg-surface-container-lowest border-t border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">© 2024 DiamondLang Foundation</span>
+<div class="flex gap-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for panel expansion logic
+        document.querySelectorAll('button[onclick*="classList.toggle"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const icon = this.querySelector('[data-icon^="keyboard_arrow_"]');
+                if(icon) {
+                    const isHidden = this.nextElementSibling.classList.contains('hidden');
+                    icon.innerText = isHidden ? 'keyboard_arrow_down' : 'keyboard_arrow_up';
+                }
+            });
+        });
+    </script>
+</body></html>

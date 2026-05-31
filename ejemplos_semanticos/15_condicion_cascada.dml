@@ -1,0 +1,9 @@
+// Cascada (F.10) — la condicion usa una variable no declarada.
+// 'desconocida' -> USO_NO_DECLARADO; la condicion infiere ERROR, asi que
+// NO se reporta un TIPO_CONDICION adicional. Unico error: USO_NO_DECLARADO.
+funcion principal()
+hacer
+    si desconocida entonces
+        escribir("a")
+    fin_si
+fin_funcion

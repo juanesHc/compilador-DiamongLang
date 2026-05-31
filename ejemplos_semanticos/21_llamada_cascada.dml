@@ -1,0 +1,13 @@
+// Regla 5 — cascada: el argumento '1 + "hola"' infiere ERROR
+// (TIPO_OPERADOR). La cascada suprime LLAMADA_TIPO sobre ese argumento,
+// pero la aridad SÍ se chequea: 'sumar' espera 2, recibe 1 (LLAMADA_ARIDAD).
+funcion sumar(entero a, entero b) retornar entero
+hacer
+    retornar a + b
+fin_funcion
+
+funcion principal() retornar entero
+hacer
+    entero r <- sumar(1 + "hola")
+    retornar r
+fin_funcion

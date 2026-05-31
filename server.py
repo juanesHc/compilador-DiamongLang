@@ -27,17 +27,17 @@ from pathlib import Path
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from lexer            import Lexer
-from parser_recursivo import ParserRecursivo
-from parser_predictivo import ParserPredictivo
-from semantico        import AnalizadorSemantico
-from tabla_ll         import (generar_tabla, tabla_a_dict_serializable,
+from lexico.lexer import Lexer
+from sintactico.parser_recursivo import ParserRecursivo
+from sintactico.parser_predictivo import ParserPredictivo
+from semantico.semantico import AnalizadorSemantico
+from sintactico.tabla_ll import (generar_tabla, tabla_a_dict_serializable,
                                sets_a_dict_serializable, NO_TERMINALES, GRAMATICA)
 # Al importar sugerencias_ia se carga automáticamente el archivo
 # .env de la raíz del proyecto (con ruta absoluta, sin importar CWD).
-from sugerencias_ia   import sugerencia_ia, info as info_ia, disponible as ia_disponible
+from ai.sugerencias_ia import sugerencia_ia, info as info_ia, disponible as ia_disponible
 # Bonus Etapa 9: IA sobre errores SEMÁNTICOS (Modalidad A).
-from sugerencias_ia_semantica import (
+from ai.sugerencias_ia_semantica import (
     sugerencia_ia_semantica,
     info       as info_ia_sem,
     disponible as ia_sem_disponible,
@@ -45,10 +45,10 @@ from sugerencias_ia_semantica import (
 # Fase 5b: clientes genéricos para el chatbot multi-modelo (/chat, /ping_chat).
 # Claude (Anthropic) y Gemini (Google), simétricos. Importación perezosa del
 # SDK dentro de cada módulo: el server arranca aunque falte alguna librería.
-import cliente_anthropic
-import cliente_gemini
+from ai import cliente_anthropic
+from ai import cliente_gemini
 
-import sdt
+from traduccion import sdt
 from datetime import datetime
 
 app = Flask(__name__)
@@ -803,6 +803,6 @@ def validar_julia():
 if __name__ == '__main__':
     print("\n💎 DiamondLang — Servidor Flask (Entrega 4)")
     print("   Corriendo en http://localhost:5000")
-    print("   Abre diamondlang.html en tu navegador")
+    print("   Abre frontend/diamondlang.html en tu navegador")
     print("   Presiona Ctrl+C para detener\n")
     app.run(debug=True, port=5000)

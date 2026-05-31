@@ -1,0 +1,798 @@
+/* ── FASE 2: Material Symbols Outlined (íconos) — opsz 24 unificado (mockups L/S/C) ── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   FASE 2 — TOKENS GLOBALES (paleta Stitch / IntelliJ Darcula).
+   Se conservan los NOMBRES de variable (todo el CSS las consulta por nombre);
+   solo cambia el VALOR. Justificación al lado de cada una.
+   ────────────────────────────────────────────────────────────────────────── */
+:root{
+  --bg:#17130d;          /* background global del body (decisión canónica §2.A.2) */
+  --surface:#1f1b15;     /* surface-container-low del mockup fundación (header/tabs) */
+  --surface2:#241f19;    /* surface-container del mockup (siguiente nivel de elevación) */
+  --border:#4f4537;      /* outline-variant del mockup (bordes/divisores técnicos) */
+  --accent:#ffc66d;      /* primary-container = amarillo IntelliJ, el acento real de marca */
+  --accent2:#ffb4ab;     /* error (rosa-rojo claro): acento secundario / estados de error */
+  --accent3:#4CAF50;     /* verde de estado "OK" usado en los mockups (status dot, banners) */
+  --accent4:#f5bd65;     /* primary-fixed-dim / surface-tint: ámbar de warning semántico */
+  --text:#ebe1d7;        /* on-surface: texto principal */
+  --muted:#d3c4b2;       /* on-surface-variant: texto secundario / muted */
+  --glow:rgba(255,198,109,0.25); /* glow del primary (#ffc66d) a baja opacidad */
+  --tok-kw:#CC7832;      /* syntax-keyword JetBrains (naranja) */
+  --tok-type:#6897BB;    /* syntax-number JetBrains (azul) — Darcula no separa tipo; se usa el azul */
+  --tok-id:#A9B7C6;      /* syntax-id JetBrains (gris-azulado) */
+  --tok-num:#6897BB;     /* syntax-number JetBrains (azul) */
+  --tok-str:#6A8759;     /* verde JetBrains para cadenas literales */
+  --tok-op:#CC7832;      /* naranja JetBrains para operadores (Darcula reusa keyword) */
+  --tok-sym:#A9B7C6;     /* sin equivalente directo: gris-azulado de identificador (Darcula) */
+  --tok-bool:#CC7832;    /* booleanos como palabra clave en Darcula → naranja */
+  --tok-err:#ffb4ab;     /* error (rosa-rojo claro) consistente con la paleta de errores */
+  --tok-cmt:#808080;     /* gris de comentarios IntelliJ Darcula */
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* utilidad reutilizable para texto monoespaciado (header badge, footer, banner) */
+.font-mono-jetbrains{font-family:'JetBrains Mono',monospace;}
+
+/* ── HEADER (Fase 3a: chrome estilo mockup fundación) ── */
+header{height:48px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface2);
+  position:sticky;top:0;z-index:200;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background 0.3s;}
+.status-dot.online{background:var(--accent3);box-shadow:0 0 8px var(--accent3);}
+.status-dot.offline{background:var(--accent2);box-shadow:0 0 8px var(--accent2);}
+
+/* ── TABS (Fase 3a: tab strip estilo mockup) ── */
+.tabs{display:flex;gap:16px;align-items:center;height:40px;overflow-x:auto;
+  border-bottom:1px solid var(--border);background:var(--surface);padding:0 16px;}
+.tab{font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;
+  display:flex;align-items:center;gap:6px;height:100%;cursor:pointer;color:var(--muted);
+  border-bottom:2px solid transparent;transition:all 0.18s;
+  letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;}
+.tab .material-symbols-outlined{font-size:16px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── PANE (altura ajustada: header 48 + tabs 40 + footer fijo 24 = 112px) ── */
+.pane{display:none;height:calc(100vh - 112px);}
+.pane.active{display:flex;flex-direction:column;}
+
+/* ── OFFLINE BANNER (Fase 3a: "Connection Lost" rojo del mockup) ── */
+.offline-banner{display:none;align-items:center;justify-content:center;gap:10px;
+  padding:6px 16px;background:#93000a;color:#ffdad6;border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-align:center;}
+.offline-banner .material-symbols-outlined{font-size:18px;}
+.offline-banner.visible{display:flex;}
+
+/* ── FOOTER / STATUS BAR (Fase 3a: nuevo, prefijo fs-) ── */
+#fs-bar{position:fixed;bottom:0;left:0;width:100%;height:24px;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;
+  background:var(--surface2);border-top:1px solid var(--border);}
+#fs-bar .fs-left,#fs-bar .fs-right{display:flex;align-items:center;gap:16px;}
+#fs-bar span{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);}
+#fs-bar .fs-right span{color:var(--text);}
+
+/* ── PANEL GENÉRICO ── */
+.panel{background:var(--bg);display:flex;flex-direction:column;overflow:hidden;}
+.panel-hdr{padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);
+  font-size:0.66rem;font-family:'JetBrains Mono',monospace;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;justify-content:space-between;}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:8px;box-shadow:0 0 8px var(--accent);}
+
+/* ── EDITOR ── */
+.editor-wrap{position:relative;flex:1;display:flex;overflow:hidden;}
+.line-nums{padding:12px 8px 12px 12px;font-family:'JetBrains Mono',monospace;font-size:0.76rem;
+  color:var(--muted);text-align:right;line-height:1.7;user-select:none;min-width:40px;
+  background:var(--surface);border-right:1px solid var(--border);overflow:hidden;}
+textarea{flex:1;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;
+  line-height:1.7;background:transparent;color:var(--text);border:none;outline:none;
+  resize:none;caret-color:var(--accent);white-space:pre;overflow:auto;}
+textarea::selection{background:rgba(124,106,247,0.3);}
+
+/* ── CONTROLES ── */
+.controls{padding:8px 12px;background:var(--surface2);border-top:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.btn{font-family:'JetBrains Mono',monospace;font-size:0.68rem;padding:6px 13px;
+  border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:all 0.18s;}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{filter:brightness(1.18);box-shadow:0 0 14px var(--glow);}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--muted);}
+.btn-ghost:hover{background:var(--surface);color:var(--text);}
+.btn-success{background:rgba(77,247,200,0.1);color:var(--accent3);border-color:var(--accent3);}
+.btn-success:hover{background:rgba(77,247,200,0.2);}
+select.btn{background:var(--surface2);color:var(--text);appearance:none;padding-right:22px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6b8a'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;cursor:pointer;}
+.spinner{display:none;width:13px;height:13px;border:2px solid rgba(124,106,247,0.3);
+  border-top-color:var(--accent);border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);flex:1;overflow:hidden;}
+.grid-bottom{grid-column:1/-1;}
+
+/* ── TOKEN CHIPS ── */
+#tokens-display{flex:1;overflow-y:auto;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;line-height:1.8;}
+.token-chip{display:inline-block;padding:2px 7px;border-radius:4px;margin:2px 2px;
+  font-size:0.68rem;cursor:default;border:1px solid transparent;transition:transform 0.1s;position:relative;}
+.token-chip:hover{transform:translateY(-1px);}
+.token-chip::after{content:attr(data-type);position:absolute;bottom:calc(100% + 4px);left:50%;
+  transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:3px 8px;border-radius:4px;font-size:0.61rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:10;}
+.token-chip:hover::after{opacity:1;}
+/* Fase 3b: bg 10% / borde 30% sobre los hex de sintaxis Stitch (--tok-* de Fase 2) */
+.tok-KEYWORD{background:rgba(204,120,50,0.10);color:var(--tok-kw);border-color:rgba(204,120,50,0.30);}      /* #CC7832 */
+.tok-TIPO{background:rgba(104,151,187,0.10);color:var(--tok-type);border-color:rgba(104,151,187,0.30);}     /* #6897BB */
+.tok-IDENTIFICADOR{background:rgba(169,183,198,0.08);color:var(--tok-id);border-color:rgba(169,183,198,0.22);}/* #A9B7C6 */
+.tok-ENTERO,.tok-REAL{background:rgba(104,151,187,0.10);color:var(--tok-num);border-color:rgba(104,151,187,0.30);}/* #6897BB */
+.tok-CADENA{background:rgba(106,135,89,0.12);color:var(--tok-str);border-color:rgba(106,135,89,0.30);}      /* #6A8759 */
+.tok-OPERADOR{background:rgba(204,120,50,0.10);color:var(--tok-op);border-color:rgba(204,120,50,0.30);}     /* #CC7832 (Darcula = keyword) */
+.tok-SIMBOLO{background:rgba(169,183,198,0.08);color:var(--tok-sym);border-color:rgba(169,183,198,0.22);}   /* #A9B7C6 */
+.tok-BOOLEANO{background:rgba(204,120,50,0.10);color:var(--tok-bool);border-color:rgba(204,120,50,0.30);}   /* #CC7832 */
+.tok-ERROR{background:rgba(255,180,171,0.12);color:var(--tok-err);border-color:rgba(255,180,171,0.35);}     /* #ffb4ab */
+.tok-COMENTARIO{background:rgba(128,128,128,0.15);color:var(--tok-cmt);border-color:rgba(128,128,128,0.30);}/* #808080 */
+
+/* ── TABLA GENÉRICA ── */
+.table-wrap{flex:1;overflow:auto;}
+table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.68rem;}
+thead tr{background:var(--surface2);position:sticky;top:0;z-index:5;}
+th{padding:8px 12px;text-align:left;font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:5px 12px;border-bottom:1px solid rgba(42,42,62,0.5);}
+tr:hover td{background:rgba(124,106,247,0.05);}
+
+/* ── ESTADO VACÍO ── */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--muted);gap:8px;font-family:'JetBrains Mono',monospace;font-size:0.71rem;}
+.empty-icon{font-size:2.2rem;opacity:0.3;}
+
+/* ── ERROR LOG ── */
+.error-log{padding:7px 14px;background:rgba(239,68,68,0.06);border-top:1px solid rgba(239,68,68,0.2);
+  font-family:'JetBrains Mono',monospace;font-size:0.67rem;color:var(--tok-err);display:none;max-height:60px;overflow-y:auto;}
+.error-log.active{display:block;}
+.ok-log{padding:7px 14px;background:rgba(77,247,200,0.06);border-top:1px solid rgba(77,247,200,0.2);
+  font-family:'JetBrains Mono',monospace;font-size:0.67rem;color:var(--accent3);display:none;}
+.ok-log.active{display:block;}
+
+/* ── STATS ── */
+.stats-bar{padding:5px 14px;background:var(--surface);border-top:1px solid var(--border);
+  display:flex;gap:14px;font-family:'JetBrains Mono',monospace;font-size:0.61rem;color:var(--muted);}
+.stat-val{color:var(--accent3);font-weight:700;}
+
+/* ── ÁRBOL SVG ── */
+.arbol-wrap{flex:1;overflow:auto;background:var(--bg);padding:16px;}
+.arbol-wrap svg{display:block;}
+
+/* ── LEYENDA ── */
+.legend{padding:6px 14px;background:var(--surface);border-top:1px solid var(--border);
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:0.59rem;color:var(--muted);}
+.legend-dot{width:8px;height:8px;border-radius:2px;}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE 3b — PESTAÑA LÉXICO (estilo mockup léxico revisado).
+   TODO scopeado a #pane-lexico para NO afectar Sintáctico/Tabla/Sets, que
+   comparten .panel/.panel-hdr/.pdot/.grid-2/.error-log/.ok-log/.empty-icon.
+   Paleta IDE literal: ide-bg #2B2B2B · ide-panel #3C3F41 · ide-border #323232 ·
+   gutter #606366.
+   ══════════════════════════════════════════════════════════════════════════ */
+#pane-lexico .lex-grid{display:grid;grid-template-columns:1fr 1fr;
+  grid-template-rows:minmax(0,3fr) minmax(0,2fr);gap:16px;padding:16px;
+  background:transparent;flex:1;overflow:hidden;}
+#pane-lexico .lex-panel{background:#3C3F41;border:1px solid #323232;border-radius:4px;
+  display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.25);
+  transition:border-color .18s;}
+#pane-lexico .lex-panel:hover{border-color:rgba(255,198,109,0.2);}
+#pane-lexico .lex-hdr{height:40px;padding:0 16px;background:#323232;border-bottom:1px solid #323232;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+#pane-lexico .lex-hdr-title{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;
+  font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;color:var(--muted);}
+#pane-lexico .lex-hdr .material-symbols-outlined{font-size:18px;}
+#pane-lexico #cur1{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);}
+
+/* editor */
+#pane-lexico .editor-wrap{flex:1;display:flex;overflow:hidden;background:#2B2B2B;}
+#pane-lexico .line-nums{background:#2B2B2B;color:#606366;border-right:1px solid #323232;}
+#pane-lexico textarea{background:#2B2B2B;color:#A9B7C6;caret-color:var(--accent);}
+#pane-lexico textarea::selection{background:rgba(255,198,109,0.25);}
+
+/* controls (footer del editor) */
+#pane-lexico .lex-controls{height:48px;padding:0 12px;background:#3C3F41;border-top:1px solid #323232;
+  display:flex;gap:8px;align-items:center;}
+#pane-lexico .lex-btn-primary{background:var(--accent);color:#442c00;border:none;border-radius:3px;
+  padding:6px 16px;font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;letter-spacing:0.05em;
+  text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+#pane-lexico .lex-btn-primary:hover{filter:brightness(1.1);}
+#pane-lexico .lex-btn-primary:active{transform:scale(0.98);}
+#pane-lexico .lex-btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+#pane-lexico .lex-btn-primary .material-symbols-outlined{font-size:16px;}
+#pane-lexico .lex-select{background:#3C3F41;color:var(--muted);border:1px solid #323232;border-radius:3px;
+  padding:6px 28px 6px 12px;font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;
+  letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23d3c4b2'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;}
+#pane-lexico .lex-select:hover{background-color:#39342d;}
+#pane-lexico .lex-btn-ghost{margin-left:auto;background:transparent;border:none;color:var(--muted);
+  cursor:pointer;padding:6px;border-radius:3px;display:inline-flex;align-items:center;transition:all .15s;}
+#pane-lexico .lex-btn-ghost:hover{background:#39342d;color:var(--text);}
+#pane-lexico .lex-btn-ghost .material-symbols-outlined{font-size:20px;}
+#pane-lexico .spinner{border:2px solid rgba(255,198,109,0.3);border-top-color:var(--accent);}
+
+/* tokens display + contador pill */
+#pane-lexico #tokens-display{background:#2B2B2B;}
+#pane-lexico #tok-count{background:#2B2B2B;border:1px solid #323232;border-radius:9999px;padding:2px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:700;color:#9dccf2;text-transform:uppercase;}
+#pane-lexico #tok-count:empty{display:none;}
+
+/* leyenda */
+#pane-lexico .legend{background:#3C3F41;border-top:1px solid #323232;padding:0 16px;height:44px;
+  gap:14px;flex-wrap:nowrap;overflow-x:auto;}
+#pane-lexico .legend-item{font-family:'Inter',sans-serif;font-size:0.56rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);gap:6px;white-space:nowrap;flex-shrink:0;}
+#pane-lexico .legend-dot{width:10px;height:10px;border-radius:2px;}
+
+/* tabla de símbolos (override del table/th/td global, solo dentro de léxico) */
+#pane-lexico .table-wrap{background:#2B2B2B;}
+#pane-lexico table{font-family:'JetBrains Mono',monospace;font-size:0.66rem;}
+#pane-lexico thead tr{background:#323232;}
+#pane-lexico th{padding:10px 24px;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:700;
+  letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid #323232;}
+#pane-lexico td{padding:8px 24px;border-bottom:1px solid rgba(50,50,50,0.45);}
+#pane-lexico tbody tr:hover td{background:#323232;}
+
+/* estado vacío → Material Symbol (el JS hardcodea ◇; lo ocultamos y dibujamos el ícono) */
+#pane-lexico .empty{color:var(--muted);}
+#pane-lexico .empty-icon{font-size:0;line-height:0;opacity:1;}
+#pane-lexico .empty-icon::after{font-family:'Material Symbols Outlined';content:'data_object';
+  font-size:2.6rem;opacity:0.25;line-height:1;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;}
+
+/* error/ok logs (el JS reescribe className → estilo por CSS) */
+#pane-lexico .error-log{background:rgba(147,0,10,0.18);border-top:1px solid rgba(255,180,171,0.25);
+  color:#ffb4ab;padding:8px 24px;}
+#pane-lexico .ok-log{background:rgba(76,175,80,0.08);border-top:1px solid rgba(76,175,80,0.25);
+  color:#4CAF50;padding:8px 24px;}
+
+/* stats bar */
+#pane-lexico .stats-bar{height:36px;padding:0 24px;background:#3C3F41;border-top:1px solid #323232;
+  align-items:center;gap:0;}
+#pane-lexico .stats-bar span{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);}
+#pane-lexico .stats-bar > span:not(:last-child){margin-right:20px;}
+#pane-lexico .stat-val{color:var(--accent);font-weight:700;}
+/* Fase 7 (C1): #s-err sólo se pinta rojo cuando hay errores (clase añadida por renderStatsLex) */
+#pane-lexico #s-err.s-err-active{color:var(--tok-err);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE 4 — PESTAÑA TABLA LL(1) (sin mockup de referencia; coherente con el
+   lenguaje visual establecido en Léxico/Sintáctico).
+   TODO scopeado a #pane-tabla. Las clases globales .panel/.panel-hdr/.pdot/
+   .empty/.empty-icon NO se redefinen a nivel global: se recrean aquí scopeadas.
+   Paleta IDE: ide-bg #2B2B2B · ide-panel #3C3F41 · ide-border #323232.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* padding alrededor del panel único (≈ grid 16px de Léxico/Sintáctico) */
+#pane-tabla{padding:16px;}
+/* panel card IDE */
+#pane-tabla .panel{background:#3C3F41;border:1px solid #323232;border-radius:4px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.25);transition:border-color .18s;}
+#pane-tabla .panel:hover{border-color:rgba(255,198,109,0.2);}
+/* header estilo IDE (mismo tratamiento que .lex-hdr/.syn-hdr) */
+#pane-tabla .panel-hdr{height:40px;padding:0 16px;background:#323232;border-bottom:1px solid #323232;
+  text-transform:none;letter-spacing:normal;}
+#pane-tabla .ll-hdr-title{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;
+  font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;color:var(--muted);}
+#pane-tabla .ll-hdr-title .material-symbols-outlined{font-size:18px;color:var(--accent);}
+/* botón "Cargar" ghost del mockup */
+#pane-tabla .ll-reload{display:inline-flex;align-items:center;gap:6px;background:transparent;
+  border:1px solid #323232;border-radius:3px;color:var(--muted);font-family:'Inter',sans-serif;
+  font-size:0.62rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:5px 12px;
+  cursor:pointer;transition:all .15s;}
+#pane-tabla .ll-reload:hover{background:#39342d;color:var(--text);border-color:rgba(255,198,109,0.5);}
+#pane-tabla .ll-reload .material-symbols-outlined{font-size:16px;}
+/* matriz LL(1) */
+#pane-tabla .ll-container{flex:1;overflow:auto;padding:0;background:#2B2B2B;}
+#pane-tabla .ll-table{border-collapse:collapse;font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;min-width:100%;}
+#pane-tabla .ll-table th{background:#323232;color:var(--muted);padding:8px 10px;
+  border:1px solid #323232;text-align:center;font-family:'Inter',sans-serif;font-size:0.56rem;
+  font-weight:700;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;
+  position:sticky;top:0;z-index:2;}
+#pane-tabla .ll-table td{padding:4px 8px;border:1px solid rgba(50,50,50,0.5);white-space:nowrap;
+  font-size:0.59rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+#pane-tabla .ll-cell-filled{background:rgba(255,198,109,0.1);color:var(--accent);}
+#pane-tabla .ll-cell-empty{color:var(--border);text-align:center;}
+#pane-tabla .ll-nt{background:#39342d;color:var(--accent);font-weight:700;
+  position:sticky;left:0;z-index:1;}
+/* estado vacío → Material Symbol (markup propio: reemplazo directo del 📊).
+   No se usa font-size:0 (no hay ::after): el glifo es un <span> real, así que el
+   ⚠ del fallback de error de cargarTablaLL (texto suelto) sigue visible a 2.2rem. */
+#pane-tabla .empty{color:var(--muted);}
+#pane-tabla .empty-icon{opacity:1;}
+#pane-tabla .empty-icon .material-symbols-outlined{font-size:2.6rem;opacity:0.25;line-height:1;
+  font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;}
+
+/* ── TRAZA PILA ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE 3c — PESTAÑA SINTÁCTICO (estilo mockup sintáctico revisado).
+   TODO scopeado a #pane-sintactico. Chrome con prefijo syn- (no se tocan
+   .panel/.controls/.btn globales). Las clases-hook exclusivas (errores-panel,
+   sem-panel, simbolos-panel, estado-*, traza-*, badge-*, err-*, sem-*, s-*,
+   ia-toggle) se re-estilizan aquí, scopeadas.
+   IDE: ide-panel #3C3F41 · ide-border #323232 · ide-bg #2B2B2B · gutter #606366
+   ══════════════════════════════════════════════════════════════════════════ */
+/* grid + paneles */
+#pane-sintactico .syn-grid{display:grid;grid-template-columns:1fr 1fr;
+  grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:16px;background:transparent;flex:1;overflow:hidden;}
+#pane-sintactico .syn-panel{background:#3C3F41;border:1px solid #323232;border-radius:4px;
+  display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.25);transition:border-color .18s;}
+#pane-sintactico .syn-panel:hover{border-color:rgba(255,198,109,0.2);}
+#pane-sintactico .syn-hdr{height:40px;padding:0 16px;background:#323232;border-bottom:1px solid #323232;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+#pane-sintactico .syn-hdr-title{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;
+  font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;color:var(--muted);}
+#pane-sintactico .syn-hdr .material-symbols-outlined{font-size:18px;}
+#pane-sintactico #cur2,#pane-sintactico #arbol-metodo,#pane-sintactico #traza-count{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);}
+
+/* editor */
+#pane-sintactico .editor-wrap{flex:1;display:flex;overflow:hidden;background:#2B2B2B;}
+#pane-sintactico .line-nums{background:#2B2B2B;color:#606366;border-right:1px solid #323232;position:relative;z-index:2;}
+/* z-index 2 → la canaleta opaca pinta POR ENCIMA del overlay (lo tapa bajo el gutter) */
+#pane-sintactico textarea{background:transparent;color:#A9B7C6;caret-color:var(--accent);position:relative;z-index:2;}
+#pane-sintactico textarea::selection{background:rgba(255,198,109,0.25);}
+
+/* ── FASE 6: overlay de resaltado inline de líneas con error ──
+   Métricas IDÉNTICAS al textarea (#pane-sintactico textarea + regla global textarea):
+   font-family JetBrains Mono, font-size 0.78rem, line-height 1.7, padding-top 12px.
+   El left horizontal se ajusta por JS (= ancho del gutter) para alinear con el texto. */
+#pane-sintactico .editor-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  pointer-events:none;overflow:hidden;z-index:1;
+  padding:12px 0;                       /* mismo padding vertical que el textarea (12px) */
+  font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.7;
+  white-space:pre;}
+#pane-sintactico .ovl-line{height:calc(0.78rem * 1.7);box-sizing:border-box;}
+/* error sintáctico → rojo suave del mockup (#bc3f3c), borde izq saturado (más grave) */
+#pane-sintactico .ovl-line.ovl-sint{background:rgba(188,63,60,0.16);box-shadow:inset 3px 0 0 rgba(188,63,60,0.85);}
+/* error semántico → ámbar suave (#f5bd65 ~12%), borde izq amarillo accent */
+#pane-sintactico .ovl-line.ovl-sem{background:rgba(245,189,101,0.12);box-shadow:inset 3px 0 0 rgba(245,189,101,0.7);}
+
+/* ── FASE 6: gutter enriquecido (#ln2) — filas .ln-row con número + íconos ── */
+#pane-sintactico .ln-row{display:flex;align-items:center;justify-content:flex-end;gap:3px;
+  height:calc(0.78rem * 1.7);}            /* alto = línea del textarea, para no desincronizar */
+#pane-sintactico .ln-num{font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:#606366;line-height:1;}
+#pane-sintactico .ln-ic{font-size:13px;line-height:1;
+  font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;}
+#pane-sintactico .ln-ic-sint{color:#bc3f3c;}     /* rojo sintáctico */
+#pane-sintactico .ln-ic-sem{color:var(--accent4);}/* ámbar semántico (#f5bd65) */
+#pane-sintactico .empty{color:var(--muted);}
+#pane-sintactico .spinner{border:2px solid rgba(255,198,109,0.3);border-top-color:var(--accent);}
+
+/* toolbar */
+#pane-sintactico .syn-controls{min-height:48px;padding:8px 12px;background:#3C3F41;border-top:1px solid #323232;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+#pane-sintactico .syn-btn-primary{background:var(--accent);color:#442c00;border:none;border-radius:3px;
+  padding:6px 16px;font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;letter-spacing:0.05em;
+  text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+#pane-sintactico .syn-btn-primary:hover{filter:brightness(1.1);}
+#pane-sintactico .syn-btn-primary:active{transform:scale(0.98);}
+#pane-sintactico .syn-btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+#pane-sintactico .syn-btn-primary .material-symbols-outlined{font-size:16px;}
+#pane-sintactico .syn-select{background:#3C3F41;color:var(--muted);border:1px solid #323232;border-radius:3px;
+  padding:6px 26px 6px 12px;font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.03em;
+  text-transform:uppercase;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23d3c4b2'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;}
+#pane-sintactico .syn-select:hover{background-color:#39342d;}
+#pane-sintactico .syn-btn-ghost{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;
+  border-radius:3px;display:inline-flex;align-items:center;transition:all .15s;margin-left:auto;}
+#pane-sintactico .syn-btn-ghost:hover{background:#39342d;color:var(--text);}
+#pane-sintactico .syn-btn-ghost .material-symbols-outlined{font-size:20px;}
+#pane-sintactico .syn-divider{width:1px;height:18px;background:#323232;margin:0 2px;}
+
+/* toggles IA → switches modernos (conserva input#usar-ia / #usar-ia-sem y .ia-toggle.disabled) */
+#pane-sintactico .ia-toggle{display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;
+  font-size:0.58rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);cursor:pointer;}
+#pane-sintactico .ia-toggle input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
+#pane-sintactico .syn-switch{width:30px;height:16px;border-radius:9999px;background:#39342d;border:1px solid #9c8f7e;
+  position:relative;flex-shrink:0;transition:all .18s;}
+#pane-sintactico .syn-switch::after{content:'';position:absolute;left:2px;top:1.5px;width:10px;height:10px;
+  border-radius:50%;background:#9c8f7e;transition:all .18s;}
+#pane-sintactico .ia-toggle input[type=checkbox]:checked + .syn-switch{background:var(--accent);border-color:var(--accent);}
+#pane-sintactico .ia-toggle input[type=checkbox]:checked + .syn-switch::after{left:16px;background:#442c00;}
+#pane-sintactico .ia-toggle.disabled{opacity:0.4;cursor:not-allowed;}
+#pane-sintactico .syn-claude-badge{background:#6B46C1;color:#fff;font-size:0.5rem;font-weight:700;
+  letter-spacing:0.05em;padding:2px 6px;border-radius:9999px;text-transform:uppercase;}
+/* Fase 5b: badge del proveedor por toggle (sintáctica→Gemini, semántica→Claude) */
+#pane-sintactico .syn-prov-badge{font-size:0.5rem;font-weight:700;letter-spacing:0.05em;
+  padding:2px 6px;border-radius:9999px;text-transform:uppercase;color:#fff;}
+#pane-sintactico .syn-prov-gemini{background:#4285F4;}   /* Gemini → azul Google */
+#pane-sintactico .syn-prov-claude{background:#6B46C1;}   /* Claude → púrpura */
+
+/* árbol */
+#pane-sintactico .arbol-wrap{flex:1;min-height:0;overflow:auto;background:#2B2B2B;padding:16px;}
+
+/* error-log / ok-log (renderArbol reescribe className → CSS) */
+#pane-sintactico .error-log{background:rgba(147,0,10,0.18);border-top:1px solid rgba(255,180,171,0.25);
+  color:#ffb4ab;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:0.66rem;display:none;}
+#pane-sintactico .error-log.active{display:block;}
+#pane-sintactico .ok-log{background:rgba(76,175,80,0.08);border-top:1px solid rgba(76,175,80,0.25);
+  color:#4CAF50;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:0.66rem;display:none;}
+#pane-sintactico .ok-log.active{display:block;}
+
+/* banner de estado (4 variantes — renderBannerEstado reescribe className) */
+#pane-sintactico .estado-analisis{display:none;padding:8px 16px;font-family:'Inter',sans-serif;font-size:0.66rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.03em;align-items:center;gap:8px;border-left:4px solid transparent;}
+#pane-sintactico .estado-analisis.show{display:flex;}
+#pane-sintactico .estado-analisis .material-symbols-outlined{font-size:18px;}  /* Fase 7 (C3) */
+#pane-sintactico .estado-ok{background:rgba(76,175,80,0.12);color:#4CAF50;border-left-color:#4CAF50;}
+#pane-sintactico .estado-sem{background:rgba(255,198,109,0.12);color:var(--accent);border-left-color:var(--accent);}
+#pane-sintactico .estado-sint{background:rgba(204,120,50,0.14);color:#CC7832;border-left-color:#CC7832;}
+#pane-sintactico .estado-bad{background:rgba(147,0,10,0.20);color:#ffb4ab;border-left-color:#ffb4ab;}
+
+/* panel errores sintácticos (rojo) — renderErroresSintacticos reescribe className */
+#pane-sintactico .errores-panel{display:none;flex-direction:column;flex:0 0 auto;min-height:0;overflow:auto;background:#241f19;border-top:1px solid #323232;}
+/* Item 4: panel de errores con alto definido, redimensionable por el usuario (arrastrar el borde inferior) y con scroll interno garantizado */
+#pane-sintactico .errores-panel.active{display:flex;height:240px;min-height:90px;max-height:65%;resize:vertical;}
+#pane-sintactico .errores-hdr{padding:10px 16px;background:#323232;font-family:'Inter',sans-serif;font-size:0.66rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:#ffb4ab;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid #323232;position:sticky;top:0;}
+#pane-sintactico .errores-hdr .material-symbols-outlined{font-size:18px;}
+#pane-sintactico .errores-list{list-style:none;padding:0;margin:0;}
+#pane-sintactico .err-item{padding:12px 16px;border-bottom:1px solid rgba(50,50,50,0.5);border-left:3px solid #ffb4ab;
+  cursor:pointer;transition:background .15s;font-family:'JetBrains Mono',monospace;font-size:0.66rem;background:#1f1b15;}
+#pane-sintactico .err-item:hover{background:#2B2B2B;}
+#pane-sintactico .err-num{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,180,171,0.2);
+  color:#ffb4ab;padding:1px 8px;border-radius:9999px;margin-right:8px;font-weight:700;font-size:0.6rem;}
+#pane-sintactico .err-loc{color:var(--muted);font-size:0.62rem;}
+#pane-sintactico .err-source{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9999px;font-size:0.52rem;
+  text-transform:uppercase;letter-spacing:0.06em;font-weight:700;}
+#pane-sintactico .err-source.local{background:#39342d;color:var(--muted);}
+#pane-sintactico .err-source.ia{background:#6B46C1;color:#fff;}
+#pane-sintactico .err-found,#pane-sintactico .err-expected,#pane-sintactico .err-suggestion{margin-top:5px;padding-left:4px;line-height:1.45;}
+#pane-sintactico .err-found{color:var(--muted);}
+#pane-sintactico .err-found b{color:#ffb4ab;}
+#pane-sintactico .err-expected{color:var(--muted);}
+#pane-sintactico .err-expected b{color:var(--tok-kw);}
+#pane-sintactico .err-suggestion{color:#7bd3ec;font-style:italic;}
+
+/* panel errores semánticos (ámbar) — renderErroresSemanticos reescribe className */
+#pane-sintactico .sem-panel{display:none;flex-direction:column;flex:0 0 auto;max-height:42%;overflow:auto;background:#241f19;border-top:1px solid #323232;}
+#pane-sintactico .sem-panel.active{display:flex;}
+#pane-sintactico .sem-hdr{padding:10px 16px;background:#323232;font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.03em;color:var(--accent);display:flex;align-items:center;gap:8px;border-bottom:1px solid #323232;position:sticky;top:0;}
+#pane-sintactico .sem-hdr .material-symbols-outlined{font-size:18px;}
+#pane-sintactico .sem-list{list-style:none;padding:0;margin:0;}
+#pane-sintactico .sem-item{padding:12px 16px;border-bottom:1px solid rgba(50,50,50,0.5);border-left:4px solid var(--accent);
+  cursor:pointer;transition:background .15s;font-family:'JetBrains Mono',monospace;font-size:0.66rem;background:#1f1b15;}
+#pane-sintactico .sem-item:hover{background:#2B2B2B;}
+#pane-sintactico .sem-item.nopos{cursor:default;}
+#pane-sintactico .sem-num{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#442c00;
+  padding:1px 8px;border-radius:9999px;margin-right:8px;font-weight:700;font-size:0.6rem;}
+#pane-sintactico .sem-rule{display:inline-block;background:rgba(255,180,171,0.16);color:#ffb4ab;border:1px solid rgba(255,180,171,0.3);
+  padding:1px 7px;border-radius:4px;font-size:0.56rem;letter-spacing:0.04em;font-weight:700;margin-right:6px;text-transform:uppercase;}
+#pane-sintactico .sem-loc{color:var(--muted);font-size:0.62rem;}
+#pane-sintactico .sem-lex{color:var(--muted);font-size:0.62rem;margin-left:6px;}
+#pane-sintactico .sem-msg{margin-top:5px;padding-left:4px;line-height:1.45;color:var(--text);}
+#pane-sintactico .sem-suggestion{margin-top:6px;line-height:1.45;color:#4CAF50;font-style:italic;
+  background:#2e2923;border:1px solid rgba(79,69,55,0.5);border-radius:4px;padding:6px 8px;}
+#pane-sintactico .sem-source{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9999px;font-size:0.52rem;
+  text-transform:uppercase;letter-spacing:0.06em;font-weight:700;}
+#pane-sintactico .sem-source.local{background:#39342d;color:var(--muted);}
+#pane-sintactico .sem-source.ia{background:#6B46C1;color:#fff;}
+#pane-sintactico .sem-suggestion.ia{color:#cbb3ff;}
+/* Fase 7 (C4): iconos Material Symbols inline (fuente IA + sugerencia) — tamaño y alineación legibles */
+#pane-sintactico .sem-src-ic{font-size:13px;vertical-align:-2px;margin-right:2px;}
+#pane-sintactico .sem-suggestion .sug-ic{font-size:15px;vertical-align:-3px;margin-right:4px;}
+
+/* tabla de símbolos semánticos (teal) — renderSimbolos reescribe className */
+#pane-sintactico .simbolos-panel{display:none;flex-direction:column;flex:0 0 auto;max-height:32%;overflow:auto;background:#241f19;border-top:1px solid #323232;}
+#pane-sintactico .simbolos-panel.active{display:flex;}
+#pane-sintactico .simbolos-hdr{padding:10px 16px;background:#323232;font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.03em;color:#7bd3ec;display:flex;align-items:center;gap:8px;border-bottom:1px solid #323232;position:sticky;top:0;}
+#pane-sintactico .simbolos-hdr .material-symbols-outlined{font-size:18px;}
+#pane-sintactico .simbolos-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.62rem;}
+#pane-sintactico .simbolos-table th{text-align:left;padding:8px 16px;color:var(--muted);font-weight:700;font-family:'Inter',sans-serif;
+  font-size:0.58rem;text-transform:uppercase;letter-spacing:0.04em;background:#2e2923;border-bottom:1px solid #323232;}
+#pane-sintactico .simbolos-table td{padding:6px 16px;border-bottom:1px solid rgba(50,50,50,0.4);color:var(--text);}
+#pane-sintactico .simbolos-table tr:hover td{background:#2B2B2B;}
+#pane-sintactico .simbolos-table .s-cat{color:#9dccf2;}
+#pane-sintactico .simbolos-table .s-tipo{color:#6897BB;}
+#pane-sintactico .simbolos-table .s-amb{color:#7bd3ec;}
+
+/* traza de pila + 8 badges diferenciados */
+#pane-sintactico .traza-wrap{flex:1;overflow:auto;background:#2B2B2B;}
+#pane-sintactico .traza-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.64rem;}
+#pane-sintactico .traza-table th{padding:8px 14px;background:#323232;color:var(--muted);font-family:'Inter',sans-serif;
+  border-bottom:1px solid #323232;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.04em;position:sticky;top:0;}
+#pane-sintactico .traza-table td{padding:6px 14px;border-bottom:1px solid rgba(50,50,50,0.4);vertical-align:top;}
+#pane-sintactico .traza-match{background:rgba(76,175,80,0.06);}
+#pane-sintactico .traza-expand{background:rgba(157,204,242,0.05);}
+#pane-sintactico .traza-error{background:rgba(255,180,171,0.08);}
+#pane-sintactico .traza-accept{background:rgba(76,175,80,0.14);}
+#pane-sintactico .traza-sync{background:rgba(245,189,101,0.06);}
+#pane-sintactico .traza-insert{background:rgba(123,211,236,0.05);}
+#pane-sintactico .traza-discard{background:rgba(204,120,50,0.06);}
+#pane-sintactico [class^="badge-"]{padding:1px 7px;border-radius:4px;font-size:0.56rem;font-weight:700;letter-spacing:0.03em;}
+#pane-sintactico .badge-match{background:rgba(76,175,80,0.20);color:#4CAF50;}      /* MATCH verde */
+#pane-sintactico .badge-expand{background:rgba(157,204,242,0.20);color:#9dccf2;}    /* EXPAND azul */
+#pane-sintactico .badge-sync{background:rgba(245,189,101,0.22);color:#f5bd65;}      /* SYNC amarillo */
+#pane-sintactico .badge-insert{background:rgba(123,211,236,0.20);color:#7bd3ec;}    /* INSERT azul claro */
+#pane-sintactico .badge-discard{background:rgba(204,120,50,0.20);color:#CC7832;}    /* DESCARTA naranja */
+#pane-sintactico .badge-pop{background:rgba(179,157,219,0.22);color:#b39ddb;}       /* POP lavanda */
+#pane-sintactico .badge-error{background:rgba(255,180,171,0.20);color:#ffb4ab;}     /* ERROR rojo */
+#pane-sintactico .badge-accept{background:rgba(76,175,80,0.35);color:#7CFC7C;font-weight:800;} /* ACEPTAR verde brillante */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE 4 — PESTAÑA PRIMERO / SIGUIENTE (sin mockup; coherente con el resto).
+   TODO scopeado a #pane-sets. .panel/.panel-hdr/.pdot/.grid-2/.empty/.empty-icon
+   NO se redefinen a nivel global: se recrean aquí scopeadas.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* grid de los dos paneles paralelos con espaciado IDE */
+#pane-sets .grid-2{gap:16px;padding:16px;background:transparent;}
+/* panel card IDE */
+#pane-sets .panel{background:#3C3F41;border:1px solid #323232;border-radius:4px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.25);transition:border-color .18s;}
+#pane-sets .panel:hover{border-color:rgba(255,198,109,0.2);}
+/* header estilo IDE */
+#pane-sets .panel-hdr{height:40px;padding:0 16px;background:#323232;border-bottom:1px solid #323232;
+  text-transform:none;letter-spacing:normal;}
+#pane-sets .set-hdr-title{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;
+  font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;color:var(--muted);}
+#pane-sets .set-hdr-title .material-symbols-outlined{font-size:18px;}
+/* acento sutil distinto por cabecera */
+#pane-sets .set-hdr-primero .material-symbols-outlined{color:var(--accent3);}    /* PRIMERO verde */
+#pane-sets .set-hdr-siguiente .material-symbols-outlined{color:#9dccf2;}          /* SIGUIENTE azul */
+/* área de conjuntos */
+#pane-sets .sets-wrap{flex:1;overflow-y:auto;padding:12px 16px;background:#2B2B2B;
+  font-family:'JetBrains Mono',monospace;font-size:0.67rem;}
+#pane-sets .set-row{padding:6px 0;border-bottom:1px solid rgba(50,50,50,0.5);display:flex;gap:12px;
+  align-items:flex-start;}
+#pane-sets .set-nt{color:var(--accent);min-width:180px;font-weight:700;}   /* no-terminal: amarillo accent */
+#pane-sets .set-vals{color:var(--text);flex:1;line-height:1.7;}
+/* chips */
+#pane-sets .set-val{display:inline-block;padding:2px 7px;border-radius:3px;margin:2px;
+  font-size:0.62rem;font-family:'JetBrains Mono',monospace;}
+#pane-sets .set-val-t{background:#39342d;color:var(--muted);border:1px solid #4f4537;}        /* terminal: cálido sutil */
+#pane-sets .set-val-e{background:rgba(255,198,109,0.12);color:var(--accent);                  /* ε / $: ámbar destacado */
+  border:1px solid rgba(255,198,109,0.35);font-weight:700;}
+/* estado vacío → Material Symbol (markup propio: reemplazo directo del ◇) */
+#pane-sets .empty{color:var(--muted);}
+#pane-sets .empty-icon{opacity:1;}
+#pane-sets .empty-icon .material-symbols-outlined{font-size:2.6rem;opacity:0.25;line-height:1;
+  font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE 5a — CHATBOT (frontend, modal + FAB). Solo visual; sin backend.
+   Todo prefijado chat- / bajo #chat-modal para no colisionar con IDs/clases-hook.
+   Paleta IntelliJ cálida reutilizada desde :root + literales del mockup
+   (#241f19 surface-container · #2e2923 high · #120e08 lowest · #39342d highest).
+   ══════════════════════════════════════════════════════════════════════════ */
+/* FAB esquina inferior derecha (debajo del modal, encima del resto) */
+#chat-fab{position:fixed;bottom:40px;right:24px;width:52px;height:52px;border-radius:50%;
+  background:var(--accent);color:#442c00;border:none;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,0.4);cursor:pointer;z-index:900;transition:all .18s;}
+#chat-fab:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,0.5);}
+#chat-fab .material-symbols-outlined{font-size:26px;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24;}
+/* trigger ghost en el header */
+#chat-header-trigger{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:5px;
+  border-radius:6px;display:inline-flex;align-items:center;transition:all .15s;}
+#chat-header-trigger:hover{background:var(--surface2);color:var(--accent);}
+#chat-header-trigger .material-symbols-outlined{font-size:20px;}
+
+/* overlay / backdrop */
+#chat-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.6);padding:32px;}
+#chat-modal.open{display:flex;animation:chatFade .18s ease-out;}
+@keyframes chatFade{from{opacity:0;}to{opacity:1;}}
+/* card del modal */
+#chat-modal .chat-card{width:680px;max-width:100%;height:780px;max-height:92vh;display:flex;flex-direction:column;
+  background:#241f19;border:1px solid var(--border);border-radius:8px;box-shadow:0 24px 60px rgba(0,0,0,0.6);
+  overflow:hidden;animation:chatZoom .18s ease-out;}
+@keyframes chatZoom{from{transform:scale(0.96);opacity:0;}to{transform:scale(1);opacity:1;}}
+/* header del modal */
+#chat-modal .chat-hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:16px;background:#2e2923;border-bottom:1px solid var(--border);flex-shrink:0;}
+#chat-modal .chat-hdr-left{display:flex;align-items:center;gap:12px;}
+#chat-modal .chat-hdr-icon{width:40px;height:40px;border-radius:4px;background:var(--accent);color:#442c00;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#chat-modal .chat-hdr-icon .material-symbols-outlined{font-size:24px;}
+#chat-modal .chat-hdr-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:600;color:var(--text);line-height:1.1;}
+#chat-modal .chat-hdr-sub{font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--muted);margin-top:3px;}
+#chat-modal .chat-hdr-right{display:flex;align-items:center;gap:12px;}
+/* selector de modelo */
+#chat-model-selector{display:flex;gap:2px;padding:2px;background:#120e08;border:1px solid var(--border);border-radius:6px;}
+#chat-model-selector button{display:flex;align-items:center;gap:6px;padding:6px 12px;border:none;border-radius:4px;
+  background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:0.62rem;font-weight:700;
+  letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap;}
+#chat-model-selector button:hover{color:var(--text);}
+#chat-model-selector button.active{background:var(--accent);color:#442c00;}
+.chat-model-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+#chat-model-selector button[data-model="claude"] .chat-model-dot{background:#CC7832;}
+#chat-model-selector button[data-model="gemini"] .chat-model-dot{background:#9dccf2;}
+/* botón cerrar */
+#chat-close{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:50%;
+  display:inline-flex;transition:all .15s;}
+#chat-close:hover{background:#39342d;color:var(--text);}
+#chat-close .material-symbols-outlined{font-size:22px;}
+/* cuerpo de la conversación */
+#chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:20px;background:#241f19;}
+/* estado vacío */
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+.chat-empty-icon{font-size:0;line-height:0;margin-bottom:18px;}
+.chat-empty-icon .material-symbols-outlined{font-size:4rem;opacity:0.16;color:var(--text);
+  font-variation-settings:'FILL' 0,'wght' 200,'GRAD' 0,'opsz' 48;}
+.chat-empty-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:600;color:var(--text);}
+.chat-empty-text{font-family:'Inter',sans-serif;font-size:0.8rem;color:var(--muted);max-width:340px;margin-top:10px;line-height:1.5;}
+.chat-prompts{margin-top:28px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
+.chat-prompt{background:#2e2923;border:1px solid var(--border);border-radius:9999px;padding:8px 16px;
+  font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--text);cursor:pointer;transition:all .15s;}
+.chat-prompt:hover{background:#39342d;border-color:var(--accent);}
+/* mensajes */
+.chat-msg{display:flex;flex-direction:column;}
+.chat-msg-user{align-items:flex-end;}
+.chat-msg-asst{align-items:flex-start;}
+.chat-bubble{max-width:88%;padding:12px 16px;font-family:'Inter',sans-serif;font-size:0.82rem;line-height:1.55;
+  box-shadow:0 1px 2px rgba(0,0,0,0.25);white-space:pre-wrap;word-wrap:break-word;}
+.chat-msg-user .chat-bubble{background:var(--accent);color:#442c00;border-radius:14px;border-top-right-radius:3px;}
+.chat-msg-asst .chat-bubble{background:#2e2923;color:var(--text);border:1px solid var(--border);
+  border-radius:14px;border-top-left-radius:3px;}
+.chat-msg-meta{display:flex;align-items:center;gap:6px;margin-top:8px;padding:0 4px;font-family:'Inter',sans-serif;
+  font-size:0.6rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);}
+.chat-msg-meta.claude .chat-model-dot{background:#CC7832;}
+.chat-msg-meta.gemini .chat-model-dot{background:#9dccf2;}
+/* footer / input */
+#chat-modal .chat-footer{padding:16px;background:#2e2923;border-top:1px solid var(--border);flex-shrink:0;}
+.chat-input-wrap{position:relative;}
+#chat-input{width:100%;background:#120e08;border:1px solid var(--border);border-radius:8px;
+  padding:14px 14px 50px;font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--text);
+  resize:none;outline:none;transition:all .15s;line-height:1.5;}
+#chat-input::placeholder{color:var(--muted);}
+#chat-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,198,109,0.15);}
+#chat-send{position:absolute;bottom:10px;right:10px;background:var(--accent);color:#442c00;border:none;
+  border-radius:5px;padding:8px 16px;font-family:'Inter',sans-serif;font-size:0.74rem;font-weight:700;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:all .15s;}
+#chat-send:hover{filter:brightness(1.08);}
+#chat-send:active{transform:scale(0.97);}
+#chat-send .material-symbols-outlined{font-size:18px;}
+.chat-footer-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;}
+#chat-clear{background:transparent;border:none;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;transition:color .15s;}
+#chat-clear:hover{color:var(--accent2);}
+#chat-clear .material-symbols-outlined{font-size:18px;}
+.chat-hint{font-family:'Inter',sans-serif;font-size:0.62rem;color:#9c8f7e;letter-spacing:0.03em;}
+/* Fase 5b — pill de modelo no disponible (sin API key en el servidor) */
+#chat-model-selector button.chat-model-disabled{opacity:0.45;cursor:not-allowed;}
+#chat-model-selector button.chat-model-disabled:hover{color:var(--muted);}
+/* burbuja de error (estilo discreto) */
+.chat-msg-asst .chat-bubble.chat-err{background:rgba(255,180,171,0.08);border-color:rgba(255,180,171,0.4);
+  color:var(--accent2);font-style:italic;}
+/* indicador "escribiendo…" */
+.chat-typing{display:inline-flex;align-items:center;gap:5px;}
+.chat-typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);opacity:0.5;
+  animation:chatBlink 1.2s infinite ease-in-out;}
+.chat-typing span:nth-child(2){animation-delay:0.2s;}
+.chat-typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes chatBlink{0%,80%,100%{opacity:0.25;transform:translateY(0);}40%{opacity:0.9;transform:translateY(-3px);}}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   PANELES COLAPSABLES (chevron en cabecera) — aplica a las 4 pestañas.
+   El chevron y la clase .collapsible-hdr los añade setupCollapsibles() en JS.
+   El colapso se basa SOLO en .panel-collapsed (no en una clase-marcador del
+   panel), para que sobreviva al re-render de los paneles dinámicos que
+   reescriben su className (.errores-panel / .sem-panel / .simbolos-panel).
+   ────────────────────────────────────────────────────────────────────────── */
+.collapsible-hdr{cursor:pointer;user-select:none;}
+.collapsible-hdr .panel-chevron{margin-left:auto;flex:0 0 auto;font-size:18px;
+  color:var(--muted);transition:transform .18s ease;}
+.collapsible-hdr:hover .panel-chevron{color:var(--text);}
+/* Oculta el cuerpo del panel colapsado, pero NO su cabecera ni los paneles
+   dinámicos anidados (esos conservan su propia lógica .active y su chevron
+   propio). !important para ganar a estilos inline (p.ej. #stats-lex) y a
+   reglas .active de alta especificidad. */
+.panel-collapsed > :not(.collapsible-hdr):not(.errores-panel):not(.sem-panel):not(.simbolos-panel){
+  display:none !important;}
+.panel-collapsed > .collapsible-hdr .panel-chevron{transform:rotate(-90deg);}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FASE C — PESTAÑA TRADUCCIÓN (SDT → Julia). Sin mockup de referencia;
+   coherente con el lenguaje visual IDE establecido en Tabla LL(1)/Léxico.
+   TODO scopeado a #pane-traduccion (salvo el toast global .tr-toast).
+   Paleta IDE: ide-bg #2B2B2B · ide-panel #3C3F41 · ide-border #323232.
+   ══════════════════════════════════════════════════════════════════════════ */
+#pane-traduccion{padding:16px;flex-direction:column;}
+#pane-traduccion.active{display:flex;}
+
+/* — estado vacío — */
+.tr-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;text-align:center;padding:48px 24px;color:var(--muted);}
+.tr-empty-icon{font-size:3.4rem;opacity:0.22;color:var(--accent);}
+.tr-empty-title{font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;color:var(--text);}
+.tr-empty-sub{font-family:'JetBrains Mono',monospace;font-size:0.66rem;line-height:1.7;
+  max-width:440px;color:var(--muted);}
+
+/* — contenido (header + controls + grid + panel IA) — */
+/* overflow-y:auto: con el panel IA añadido, el contenido puede exceder el alto
+   de la pestaña; el side-by-side mantiene un alto mínimo y el resto scrollea. */
+.tr-content{flex:1;display:flex;flex-direction:column;overflow-y:auto;
+  background:#3C3F41;border:1px solid #323232;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.25);}
+#pane-traduccion .tr-header{height:40px;padding:0 16px;background:#323232;border-bottom:1px solid #323232;
+  text-transform:none;letter-spacing:normal;display:flex;align-items:center;justify-content:space-between;}
+#pane-traduccion .tr-header > span:first-child{display:flex;align-items:center;
+  font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;color:var(--text);}
+.tr-meta{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);}
+
+/* — barra de controles — */
+#pane-traduccion .tr-controls{display:flex;align-items:center;gap:10px;
+  background:#2f2b25;border-top:none;border-bottom:1px solid #323232;}
+.tr-stats{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.6rem;
+  color:var(--muted);white-space:nowrap;}
+
+/* — los dos paneles de código side-by-side — */
+#pane-traduccion .grid-2{flex:1 1 auto;min-height:300px;background:#323232;}
+.tr-code-panel{background:#2B2B2B;display:flex;flex-direction:column;overflow:hidden;}
+#pane-traduccion .tr-code-hdr{height:34px;padding:0 14px;background:#323232;border-bottom:1px solid #323232;
+  text-transform:none;letter-spacing:normal;display:flex;align-items:center;}
+#pane-traduccion .tr-code-hdr > span{display:flex;align-items:center;
+  font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:600;color:var(--muted);}
+.tr-code-body{flex:1;margin:0;overflow:auto;padding:14px 16px;background:#2B2B2B;color:#A9B7C6;
+  font-family:'JetBrains Mono',monospace;font-size:0.74rem;line-height:1.7;
+  white-space:pre;tab-size:4;border-radius:0 0 4px 4px;}
+
+/* ── Panel BONUS IA (Fase D) — card IDE coherente con el resto ── */
+.tr-ia-panel{flex:0 0 auto;margin-top:12px;background:#3C3F41;border:1px solid #323232;
+  border-radius:4px;overflow:hidden;}
+#pane-traduccion .tr-ia-hdr{height:40px;padding:0 16px;background:#323232;border-bottom:1px solid #323232;
+  text-transform:none;letter-spacing:normal;display:flex;align-items:center;justify-content:space-between;}
+#pane-traduccion .tr-ia-hdr > span:first-child{display:flex;align-items:center;gap:6px;
+  font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;color:var(--text);}
+#pane-traduccion .tr-ia-hdr .material-symbols-outlined{font-size:1.05rem;color:var(--accent);}
+.tr-ia-meta{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);}
+
+/* barra de controles del panel IA */
+.tr-ia-controls{display:flex;align-items:center;gap:10px;padding:10px 16px;
+  background:#2f2b25;border-bottom:1px solid #323232;}
+/* loader/status mientras Claude piensa: monoespaciado, muted, con puntos animados */
+.tr-ia-status{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);}
+.tr-ia-status.thinking::after{content:'';animation:tr-ia-dots 1.2s steps(4,end) infinite;}
+@keyframes tr-ia-dots{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}100%{content:'';}}
+
+/* estado vacío: centrado, fondo muted, texto italic muted */
+.tr-ia-empty{padding:24px;text-align:center;background:#2B2B2B;
+  font-family:'JetBrains Mono',monospace;font-size:0.66rem;font-style:italic;
+  color:var(--muted);line-height:1.7;}
+
+/* secciones (validación / problemas / optimizaciones) */
+.tr-ia-section{padding:12px 16px;border-bottom:1px solid #323232;background:#2B2B2B;}
+.tr-ia-section:last-child{border-bottom:none;}
+.tr-ia-section-title{display:flex;align-items:center;gap:6px;margin-bottom:8px;
+  font-family:'Inter',sans-serif;font-size:0.66rem;font-weight:700;letter-spacing:0.03em;
+  text-transform:uppercase;color:var(--accent);}
+.tr-ia-section-title .material-symbols-outlined{font-size:1rem;}
+.tr-ia-section-body{font-family:'JetBrains Mono',monospace;font-size:0.7rem;line-height:1.75;
+  color:#A9B7C6;padding-left:2px;}
+ul.tr-ia-section-body{margin:0;padding-left:20px;list-style:disc;}
+ul.tr-ia-section-body li{margin-bottom:6px;}
+ul.tr-ia-section-body li:last-child{margin-bottom:0;}
+#tr-ia-problemas-section .tr-ia-section-title{color:#e0707a;}
+
+/* estado de error: panel rojo discreto */
+.tr-ia-error{margin:12px 16px;padding:12px 14px;background:rgba(224,112,122,0.08);
+  border:1px solid rgba(224,112,122,0.4);border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;line-height:1.6;color:#e0707a;}
+
+/* botón deshabilitado (IA no disponible) */
+#tr-ia-btn:disabled{opacity:0.45;cursor:not-allowed;}
+
+/* — toast "Copiado" (global, anclado al body) — */
+.tr-toast{position:fixed;bottom:110px;right:24px;padding:10px 18px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;
+  opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;
+  z-index:5000;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.tr-toast-show{opacity:1;transform:translateY(0);}

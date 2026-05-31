@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiamondLang 💎 — Compilador</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<!-- Fase 2 migración visual: Tailwind CDN (plugins forms + container-queries, como en los mockups Stitch) -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Fase 2: Inter (UI) + JetBrains Mono (código) + Material Symbols Outlined (íconos), un solo <link> combinado replicado de los mockups revisados -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- ──────────────────────────────────────────────────────────────────────────
+     FASE 2 — Configuración de Tailwind (replica de los mockups revisados).
+     Base = tailwind.config del mockup "fundación revisado" (fuente de verdad).
+     Overrides aplicados según §2.A.2 de MIGRACION_VISUAL.md:
+       primary       #FFC66D → #ffe9cc   (3/4 mockups, vistas IDE reales)
+       background    #2B2B2B → #17130d   (#2B2B2B se reserva para el editor = ide-bg)
+       surface-tint  #FFC66D → #f5bd65   (consistente con primary-fixed-dim)
+     Extensiones añadidas del mockup Léxico (ide-*, syntax-*, toolbar-height,
+     container-padding) para que las clases Tailwind de fases 3a-3c no se rompan.
+     ────────────────────────────────────────────────────────────────────────── -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary-fixed": "#001e30",
+          "on-surface-variant": "#d3c4b2",
+          "on-error": "#690005",
+          "on-primary-container": "#785100",
+          "on-secondary-container": "#8fbee3",
+          "surface-container-lowest": "#120e08",
+          "surface": "#17130d",
+          "secondary-fixed": "#cae6ff",
+          "surface-tint": "#f5bd65",
+          "on-primary": "#442c00",
+          "on-primary-fixed-variant": "#614000",
+          "tertiary-fixed": "#afecff",
+          "surface-bright": "#3e3831",
+          "primary-fixed": "#ffddaf",
+          "on-secondary": "#00344e",
+          "surface-variant": "#39342d",
+          "on-tertiary-fixed-variant": "#004e5d",
+          "surface-container": "#241f19",
+          "tertiary-container": "#84dcf5",
+          "on-tertiary": "#003641",
+          "outline": "#9c8f7e",
+          "on-tertiary-fixed": "#001f26",
+          "tertiary-fixed-dim": "#7bd3ec",
+          "secondary": "#9dccf2",
+          "primary-fixed-dim": "#f5bd65",
+          "surface-container-low": "#1f1b15",
+          "primary-container": "#ffc66d",
+          "surface-container-highest": "#39342d",
+          "tertiary": "#cbf2ff",
+          "error": "#ffb4ab",
+          "on-secondary-fixed-variant": "#144b6b",
+          "inverse-surface": "#ebe1d7",
+          "background": "#17130d",
+          "on-background": "#ebe1d7",
+          "on-surface": "#ebe1d7",
+          "inverse-on-surface": "#353029",
+          "error-container": "#93000a",
+          "outline-variant": "#4f4537",
+          "on-tertiary-container": "#006173",
+          "surface-dim": "#17130d",
+          "secondary-container": "#174d6e",
+          "inverse-primary": "#805600",
+          "primary": "#ffe9cc",
+          "on-error-container": "#ffdad6",
+          "secondary-fixed-dim": "#9dccf2",
+          "surface-container-high": "#2e2923",
+          "on-primary-fixed": "#281800",
+          "ide-bg": "#2B2B2B",
+          "ide-panel": "#3C3F41",
+          "ide-border": "#323232",
+          "syntax-keyword": "#CC7832",
+          "syntax-number": "#6897BB",
+          "syntax-id": "#A9B7C6"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "gutter": "1px",
+          "unit": "4px",
+          "margin-sm": "8px",
+          "margin-md": "16px",
+          "panel-padding": "12px",
+          "toolbar-height": "48px",
+          "container-padding": "24px"
+        },
+        "fontFamily": {
+          "label-caps": ["Inter"],
+          "code-md": ["JetBrains Mono"],
+          "body-md": ["Inter"],
+          "headline-lg": ["Inter"],
+          "headline-md": ["Inter"],
+          "body-sm": ["Inter"],
+          "code-sm": ["JetBrains Mono"]
+        },
+        "fontSize": {
+          "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+          "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+          "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+          "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body>
+
+<header>
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2">
+      <!-- Logo: diamante monocromo en acento amarillo IntelliJ (decisión: amarillo, no el primary crema) -->
+      <svg class="w-6 h-6" style="color:var(--accent)" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 12L12 3L18 12L12 21L6 12Z" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M6 12L18 12" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M12 3L12 21" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <div class="flex items-baseline">
+        <span class="text-headline-md text-on-surface">Diamond</span>
+        <span class="text-headline-md font-bold ml-1" style="color:var(--accent)">Lang</span>
+        <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold font-mono-jetbrains bg-surface-variant text-on-surface-variant">v4.0</span>
+      </div>
+    </div>
+    <div class="h-4 w-px mx-2" style="background:var(--border)"></div>
+    <div class="server-status flex items-center gap-2">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text" class="text-body-sm" style="color:var(--muted)">Verificando...</span>
+    </div>
+    <!-- Trigger del chatbot (Fase 5a): botón ghost junto al status del servidor -->
+    <button id="chat-header-trigger" type="button" aria-label="Abrir asistente DiamondLang" onclick="toggleChat()">
+      <span class="material-symbols-outlined">chat_bubble</span>
+    </button>
+  </div>
+</header>
+
+<div class="offline-banner" id="offline-banner">
+  <span class="material-symbols-outlined">cloud_off</span>
+  <span>Servidor Python no detectado — ejecuta: <strong>python server.py</strong></span>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('lexico')"><span class="material-symbols-outlined">code</span><span>Léxico</span></div>
+  <div class="tab" onclick="switchTab('sintactico')"><span class="material-symbols-outlined">account_tree</span><span>Sintáctico</span></div>
+  <div class="tab" onclick="switchTab('tabla')"><span class="material-symbols-outlined">grid_on</span><span>Tabla LL(1)</span></div>
+  <div class="tab" onclick="switchTab('sets')"><span class="material-symbols-outlined">list</span><span>PRIMERO / SIGUIENTE</span></div>
+  <div class="tab" onclick="switchTab('traduccion')"><span class="material-symbols-outlined">translate</span><span>⑤ Traducción</span></div>
+</div>
+
+<!-- ════════════════════════════════
+     PESTAÑA 1 — LÉXICO
+════════════════════════════════ -->
+<div class="pane active" id="pane-lexico">
+  <div class="lex-grid">
+
+    <!-- Editor (top-left) -->
+    <div class="lex-panel">
+      <div class="lex-hdr">
+        <span class="lex-hdr-title"><span class="material-symbols-outlined" style="color:var(--tok-kw)">description</span>Editor — DiamondLang</span>
+        <span id="cur1">Ln 1, Col 1</span>
+      </div>
+      <div class="editor-wrap">
+        <div class="line-nums" id="ln1">1</div>
+        <textarea id="ed1" spellcheck="false" placeholder="// Escribe código DiamondLang...&#10;// Ctrl+Enter para analizar"></textarea>
+      </div>
+      <div class="lex-controls">
+        <button class="lex-btn-primary" id="btn-lex" onclick="analizarLexico()"><span class="material-symbols-outlined">play_arrow</span>Analizar léxico</button>
+        <div class="spinner" id="sp1"></div>
+        <select class="lex-select" id="ej1" onchange="cargarEjemplo('ed1','ej1',()=>analizarLexico())">
+          <option value="">Ejemplos</option>
+          <option value="hola">Hola mundo</option>
+          <option value="factorial">Factorial</option>
+          <option value="fibonacci">Fibonacci</option>
+          <option value="error_lex">Con errores léxicos</option>
+        </select>
+        <button class="lex-btn-ghost" onclick="limpiar('ed1','ln1','tokens-display','tabla-lex','err-lex','ok-lex','stats-lex')" title="Limpiar"><span class="material-symbols-outlined">close</span></button>
+      </div>
+    </div>
+
+    <!-- Tokens (top-right) -->
+    <div class="lex-panel">
+      <div class="lex-hdr">
+        <span class="lex-hdr-title"><span class="material-symbols-outlined" style="color:#9dccf2">format_list_bulleted</span>Tokens</span>
+        <span id="tok-count"></span>
+      </div>
+      <div id="tokens-display"><div class="empty"><div class="empty-icon">◇</div><div>Esperando análisis</div></div></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-kw)"></div>Palabra clave</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-type)"></div>Tipo</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-id)"></div>ID</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-num)"></div>Número</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-str)"></div>Cadena</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-op)"></div>Operador</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--tok-err)"></div>Error</div>
+      </div>
+    </div>
+
+    <!-- Tabla de símbolos (bottom, full-width) -->
+    <div class="lex-panel" style="grid-column:1 / -1;">
+      <div class="lex-hdr">
+        <span class="lex-hdr-title"><span class="material-symbols-outlined" style="color:#7bd3ec">table_chart</span>Tabla de símbolos</span>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>#</th><th>Lexema</th><th>Tipo de token</th><th>Línea</th><th>Columna</th></tr></thead>
+        <tbody id="tabla-lex"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">— Esperando análisis —</td></tr></tbody></table>
+      </div>
+      <div class="error-log" id="err-lex"></div>
+      <div class="ok-log" id="ok-lex"></div>
+      <div class="stats-bar" id="stats-lex" style="display:none">
+        <span>Total: <span class="stat-val" id="s-total">0</span></span>
+        <span>Palabras clave: <span class="stat-val" id="s-kw">0</span></span>
+        <span>Identificadores: <span class="stat-val" id="s-id">0</span></span>
+        <span>Errores: <span class="stat-val" id="s-err">0</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     PESTAÑA 2 — SINTÁCTICO
+════════════════════════════════ -->
+<div class="pane" id="pane-sintactico">
+  <div class="syn-grid">
+
+    <!-- Editor sintáctico (top-left) -->
+    <div class="syn-panel">
+      <div class="syn-hdr">
+        <span class="syn-hdr-title"><span class="material-symbols-outlined" style="color:var(--tok-kw)">edit_note</span>Editor</span>
+        <span id="cur2">Ln 1, Col 1</span>
+      </div>
+      <div class="editor-wrap">
+        <div class="line-nums" id="ln2"><div class="ln-row"><span class="ln-num">1</span></div></div>
+        <!-- Fase 6: overlay de resaltado inline (detrás del textarea, pointer-events:none) -->
+        <div id="ed2-overlay" class="editor-overlay"></div>
+        <textarea id="ed2" spellcheck="false" placeholder="// Escribe código DiamondLang...&#10;// Ctrl+Enter para parsear"></textarea>
+      </div>
+      <div class="syn-controls">
+        <button class="syn-btn-primary" id="btn-parse" onclick="parsear()"><span class="material-symbols-outlined">play_arrow</span>Analizar</button>
+        <div class="spinner" id="sp2"></div>
+        <select class="syn-select" id="metodo-sel">
+          <option value="recursivo">① Recursivo</option>
+          <option value="predictivo">② Predictivo LL</option>
+        </select>
+        <span class="syn-divider"></span>
+        <label class="ia-toggle" id="ia-toggle-label" title="Enriquecer sugerencias SINTÁCTICAS con la API de Gemini">
+          <input type="checkbox" id="usar-ia"><span class="syn-switch"></span>IA sintaxis
+        </label>
+        <span class="syn-prov-badge syn-prov-gemini">Gemini</span>
+        <label class="ia-toggle" id="ia-sem-toggle-label" title="Enriquecer sugerencias SEMÁNTICAS con la API de Claude">
+          <input type="checkbox" id="usar-ia-sem"><span class="syn-switch"></span>IA semántica
+        </label>
+        <span class="syn-prov-badge syn-prov-claude">Claude</span>
+        <span class="syn-divider"></span>
+        <select class="syn-select" id="ej2" onchange="cargarEjemplo('ed2','ej2',()=>parsear())">
+          <option value="">Ejemplos</option>
+          <option value="hola">Hola mundo</option>
+          <option value="factorial">Factorial</option>
+          <option value="fibonacci">Fibonacci</option>
+          <option value="condicional">Condicional</option>
+        </select>
+        <!-- Selector de ejemplos de errores SINTÁCTICOS (carga ejemplos_errores/) -->
+        <select class="syn-select" id="ej-sint" onchange="cargarEjemploSintactico()" title="Carga un .dml de la carpeta ejemplos_errores/">
+          <option value="">Ejemplos sintácticos</option>
+        </select>
+        <!-- Selector de ejemplos de errores semánticos (Etapa 10) -->
+        <select class="syn-select" id="ej-sem" onchange="cargarEjemploSemantico()" title="Carga un .dml de la carpeta ejemplos_semanticos/">
+          <option value="">Ejemplos semánticos</option>
+        </select>
+        <button class="syn-btn-ghost" onclick="limpiarSint()" title="Limpiar"><span class="material-symbols-outlined">close</span></button>
+      </div>
+    </div>
+
+    <!-- Árbol + paneles (top-right) -->
+    <div class="syn-panel">
+      <div class="syn-hdr">
+        <span class="syn-hdr-title"><span class="material-symbols-outlined" style="color:#9dccf2">account_tree</span>Árbol sintáctico</span>
+        <span id="arbol-metodo"></span>
+      </div>
+      <!-- Banner de estado combinado: sintáctico + semántico (Etapa 8) -->
+      <div class="estado-analisis" id="estado-analisis"></div>
+      <div class="arbol-wrap" id="arbol-wrap">
+        <div class="empty"><span class="material-symbols-outlined" style="font-size:2.4rem;opacity:0.3">account_tree</span><div>El árbol aparecerá aquí</div></div>
+      </div>
+      <div class="error-log" id="err-sint"></div>
+      <div class="ok-log" id="ok-sint"></div>
+      <!-- Lista numerada de errores sintácticos (Entrega 3) -->
+      <div class="errores-panel" id="errores-panel">
+        <div class="errores-hdr">
+          <span class="material-symbols-outlined">report</span>
+          <span>Errores sintácticos</span>
+          <span id="errores-count" style="color:var(--muted);font-weight:normal"></span>
+          <span style="margin-left:auto;color:var(--muted);font-size:0.58rem;font-weight:normal;text-transform:none;letter-spacing:0">Click para resaltar</span>
+        </div>
+        <ol class="errores-list" id="errores-list"></ol>
+      </div>
+      <!-- Lista numerada de errores SEMÁNTICOS (Etapa 8) -->
+      <div class="sem-panel" id="sem-panel">
+        <div class="sem-hdr">
+          <span class="material-symbols-outlined">error</span>
+          <span>Errores semánticos</span>
+          <span id="sem-count" style="color:var(--muted);font-weight:normal"></span>
+          <span style="margin-left:auto;color:var(--muted);font-size:0.58rem;font-weight:normal;text-transform:none;letter-spacing:0">Click para resaltar</span>
+        </div>
+        <ol class="sem-list" id="sem-list"></ol>
+      </div>
+      <!-- Tabla de símbolos de la fase semántica (Etapa 8) -->
+      <div class="simbolos-panel" id="simbolos-panel">
+        <div class="simbolos-hdr">
+          <span class="material-symbols-outlined">table_chart</span>
+          <span>Tabla de símbolos</span>
+          <span id="simbolos-count" style="color:var(--muted);font-weight:normal"></span>
+        </div>
+        <table class="simbolos-table">
+          <thead><tr><th>Nombre</th><th>Categoría</th><th>Tipo</th><th>Ámbito</th></tr></thead>
+          <tbody id="simbolos-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Traza pila (solo predictivo, full-width abajo) -->
+    <div class="syn-panel" style="grid-column:1 / -1;" id="traza-panel">
+      <div class="syn-hdr">
+        <span class="syn-hdr-title"><span class="material-symbols-outlined" style="color:var(--muted)">terminal</span>Traza de pila — Método predictivo</span>
+        <span id="traza-count"></span>
+      </div>
+      <div class="traza-wrap">
+        <table class="traza-table">
+          <thead><tr><th>Paso</th><th>Pila (tope →)</th><th>Lookahead</th><th>Acción</th><th>Producción</th></tr></thead>
+          <tbody id="traza-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">— Selecciona Método Predictivo y analiza —</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     PESTAÑA 3 — TABLA LL(1)
+════════════════════════════════ -->
+<div class="pane" id="pane-tabla">
+  <div class="panel" style="flex:1;overflow:hidden;">
+    <div class="panel-hdr">
+      <span class="ll-hdr-title"><span class="material-symbols-outlined">grid_on</span>Tabla de Análisis LL(1) — M[No-terminal, Terminal]</span>
+      <button class="btn btn-ghost ll-reload" onclick="cargarTablaLL()"><span class="material-symbols-outlined">refresh</span>Cargar</button>
+    </div>
+    <div class="ll-container" id="ll-container">
+      <div class="empty"><div class="empty-icon"><span class="material-symbols-outlined">grid_on</span></div><div>Presiona "Cargar" para generar la tabla</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     PESTAÑA 4 — PRIMERO / SIGUIENTE
+════════════════════════════════ -->
+<div class="pane" id="pane-sets">
+  <div class="grid-2" style="grid-template-rows:1fr;">
+
+    <div class="panel">
+      <div class="panel-hdr"><span class="set-hdr-title set-hdr-primero"><span class="material-symbols-outlined">forward</span>Conjuntos PRIMERO</span></div>
+      <div class="sets-wrap" id="primero-wrap"><div class="empty"><div class="empty-icon"><span class="material-symbols-outlined">trending_flat</span></div><div>Carga la Tabla LL(1) primero</div></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr"><span class="set-hdr-title set-hdr-siguiente"><span class="material-symbols-outlined">arrow_forward</span>Conjuntos SIGUIENTE</span></div>
+      <div class="sets-wrap" id="siguiente-wrap"><div class="empty"><div class="empty-icon"><span class="material-symbols-outlined">trending_flat</span></div><div>Carga la Tabla LL(1) primero</div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     PESTAÑA 5 — TRADUCCIÓN (Fase C)
+     SDT → Julia. Se popula automáticamente desde parsear() cuando el
+     análisis es válido (sintáctico Y semántico). Todo prefijado 'tr-'.
+════════════════════════════════ -->
+<div class="pane" id="pane-traduccion">
+
+  <!-- estado vacío por defecto -->
+  <div id="tr-empty" class="tr-empty">
+    <span class="material-symbols-outlined tr-empty-icon">translate</span>
+    <div class="tr-empty-title">Aún no hay traducción.</div>
+    <div class="tr-empty-sub">
+      Analiza un programa válido en la pestaña Sintáctico para generar
+      la traducción a Julia. Si hay errores sintácticos o semánticos,
+      corrígelos primero para ver la traducción.
+    </div>
+  </div>
+
+  <!-- contenido cuando hay traducción (oculto hasta que renderTraduccion lo muestre) -->
+  <div id="tr-content" class="tr-content" style="display:none;">
+
+    <div id="tr-header" class="panel-hdr tr-header">
+      <span><span class="pdot"></span>Traducción a Julia</span>
+      <span class="tr-meta" id="tr-meta">generada el —</span>
+    </div>
+
+    <div class="controls tr-controls">
+      <button id="tr-btn-download" class="btn btn-primary" onclick="descargarJulia()">
+        <span class="material-symbols-outlined">download</span>
+        Descargar .jl
+      </button>
+      <button id="tr-btn-copy" class="btn btn-ghost" onclick="copiarJulia()">
+        <span class="material-symbols-outlined">content_copy</span>
+        Copiar al portapapeles
+      </button>
+      <span id="tr-stats" class="tr-stats"></span>
+    </div>
+
+    <div class="grid-2" style="grid-template-rows:1fr;">
+      <div class="tr-code-panel">
+        <div class="panel-hdr tr-code-hdr">
+          <span><span class="pdot"></span>Código fuente — DiamondLang</span>
+        </div>
+        <pre class="tr-code-body" id="tr-src-code"></pre>
+      </div>
+
+      <div class="tr-code-panel">
+        <div class="panel-hdr tr-code-hdr">
+          <span><span class="pdot"></span>Código generado — Julia</span>
+        </div>
+        <pre class="tr-code-body" id="tr-jl-code"></pre>
+      </div>
+    </div>
+
+    <!-- ── Panel BONUS IA (Fase D, Modalidad C): validación + optimización ──
+         Capa OPCIONAL: el side-by-side de arriba funciona igual sin esto. -->
+    <div class="tr-ia-panel" id="tr-ia-panel">
+      <div class="panel-hdr tr-ia-hdr">
+        <span>
+          <span class="material-symbols-outlined">auto_awesome</span>
+          Análisis con IA
+        </span>
+        <span id="tr-ia-meta" class="tr-ia-meta"><!-- modelo · hora --></span>
+      </div>
+
+      <div class="controls tr-ia-controls">
+        <button id="tr-ia-btn" class="btn btn-primary" onclick="solicitarAnalisisIA()">
+          <span class="material-symbols-outlined">auto_fix_high</span>
+          Validar y optimizar con IA
+        </button>
+        <span id="tr-ia-status" class="tr-ia-status"></span>
+      </div>
+
+      <!-- placeholder vacío hasta que el usuario ejecute -->
+      <div id="tr-ia-empty" class="tr-ia-empty">
+        Pulsa el botón para que la IA analice el código Julia generado
+        y sugiera optimizaciones idiomáticas.
+      </div>
+
+      <!-- contenido cuando hay respuesta -->
+      <div id="tr-ia-result" style="display:none;">
+        <div class="tr-ia-section">
+          <div class="tr-ia-section-title">
+            <span class="material-symbols-outlined">verified</span>
+            Validación
+          </div>
+          <div id="tr-ia-validacion" class="tr-ia-section-body"></div>
+        </div>
+
+        <div class="tr-ia-section" id="tr-ia-problemas-section" style="display:none;">
+          <div class="tr-ia-section-title">
+            <span class="material-symbols-outlined">error_outline</span>
+            Problemas detectados
+          </div>
+          <ul id="tr-ia-problemas" class="tr-ia-section-body"></ul>
+        </div>
+
+        <div class="tr-ia-section">
+          <div class="tr-ia-section-title">
+            <span class="material-symbols-outlined">tips_and_updates</span>
+            Sugerencias de optimización
+          </div>
+          <ul id="tr-ia-optimizaciones" class="tr-ia-section-body"></ul>
+        </div>
+      </div>
+
+      <!-- estado de error -->
+      <div id="tr-ia-error" class="tr-ia-error" style="display:none;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════
+     FOOTER / STATUS BAR (Fase 3a — chrome, sin JS nuevo, IDs prefijo fs-)
+════════════════════════ -->
+<footer id="fs-bar">
+  <div class="fs-left">
+    <span id="fs-project">DiamondLang v4.0 · Entrega 4</span>
+  </div>
+  <div class="fs-right">
+    <span id="fs-cursor">Ln 1, Col 1</span>   <!-- Fase 7 (C5): posición viva del cursor de la pestaña activa -->
+    <span id="fs-encoding">UTF-8</span>
+    <span id="fs-indent">Espacios: 4</span>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════════
+     CHATBOT (Fase 5a) — FAB + modal. Solo frontend.
+════════════════════════════════════════════════ -->
+<button id="chat-fab" type="button" aria-label="Abrir asistente DiamondLang" onclick="toggleChat()">
+  <span class="material-symbols-outlined">chat_bubble</span>
+</button>
+
+<div id="chat-modal" role="dialog" aria-modal="true" aria-labelledby="chat-title" aria-hidden="true">
+  <div class="chat-card" role="document">
+    <!-- Header -->
+    <div class="chat-hdr">
+      <div class="chat-hdr-left">
+        <div class="chat-hdr-icon"><span class="material-symbols-outlined">auto_awesome</span></div>
+        <div>
+          <div class="chat-hdr-title" id="chat-title">Asistente DiamondLang</div>
+          <div class="chat-hdr-sub">Pregunta sobre tu código o el compilador</div>
+        </div>
+      </div>
+      <div class="chat-hdr-right">
+        <div id="chat-model-selector">
+          <button type="button" data-model="claude" class="active" onclick="setChatModel('claude')"><span class="chat-model-dot"></span>Claude Haiku</button>
+          <button type="button" data-model="gemini" onclick="setChatModel('gemini')"><span class="chat-model-dot"></span>Gemini Flash</button>
+        </div>
+        <button id="chat-close" type="button" aria-label="Cerrar asistente" onclick="closeChat()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+    </div>
+    <!-- Body (renderizado por renderChatBody) -->
+    <div id="chat-body"></div>
+    <!-- Footer / input -->
+    <div class="chat-footer">
+      <div class="chat-input-wrap">
+        <textarea id="chat-input" rows="3" placeholder="Pregunta algo sobre tu código..." aria-label="Mensaje para el asistente"></textarea>
+        <button id="chat-send" type="button" onclick="sendChat()"><span>Enviar</span><span class="material-symbols-outlined">send</span></button>
+      </div>
+      <div class="chat-footer-bottom">
+        <button id="chat-clear" type="button" onclick="clearChat()"><span class="material-symbols-outlined">delete</span>Limpiar conversación</button>
+        <span class="chat-hint">Enter envía · Shift+Enter nueva línea · ESC cierra</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════
+     JAVASCRIPT
+════════════════════════ -->
+<script src="script.js"></script>
+</body>
+</html>

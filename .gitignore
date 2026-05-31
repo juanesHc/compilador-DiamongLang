@@ -1,4 +1,4 @@
-# Variables de entorno (contienen API keys, NO subir al repo)
+
 .env
 .env.local
 .env.*.local
@@ -21,3 +21,8 @@ __pycache__/
 .idea/
 .DS_Store
 Thumbs.db
+
+
+README_DiamondLang.docx
+README_ENTREGA3.md
+README_ENTREGA4.md

@@ -11,3 +11,4 @@ python-dotenv>=1.0.0
 # Fase 5b — cliente moderno de Google Generative AI (Gemini Flash).
 # Se importa de forma perezosa: la app arranca aunque no esté instalado.
 google-genai>=1.0.0
+gunicorn>=21.2.0

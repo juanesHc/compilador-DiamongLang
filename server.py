@@ -24,7 +24,7 @@ import json
 import re
 from pathlib import Path
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 from lexico.lexer import Lexer
@@ -53,6 +53,25 @@ from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
+
+# ─────────────────────────────────────────────
+#  Frontend estático: la app (HTML/CSS/JS) vive en frontend/ y se sirve
+#  desde el mismo origen que la API. Así un único servicio web (local o
+#  Render) entrega UI + API juntos, sin URLs hardcodeadas ni CORS.
+# ─────────────────────────────────────────────
+_FRONTEND_DIR = Path(__file__).resolve().parent / 'frontend'
+
+@app.route('/', methods=['GET'])
+def index():
+    return send_from_directory(_FRONTEND_DIR, 'diamondlang.html')
+
+@app.route('/style.css', methods=['GET'])
+def _frontend_css():
+    return send_from_directory(_FRONTEND_DIR, 'style.css')
+
+@app.route('/script.js', methods=['GET'])
+def _frontend_js():
+    return send_from_directory(_FRONTEND_DIR, 'script.js')
 
 # Cache en memoria de las sugerencias IA semánticas, VIVO entre peticiones.
 # Decisión: un dict de módulo (no por-request) para que, dentro de una
@@ -801,8 +820,11 @@ def validar_julia():
 #  INICIO
 # ══════════════════════════════════════════════
 if __name__ == '__main__':
+    import os
+    port  = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
     print("\n💎 DiamondLang — Servidor Flask (Entrega 4)")
-    print("   Corriendo en http://localhost:5000")
+    print(f"   Corriendo en http://localhost:{port}")
     print("   Abre frontend/diamondlang.html en tu navegador")
     print("   Presiona Ctrl+C para detener\n")
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=port, debug=debug)

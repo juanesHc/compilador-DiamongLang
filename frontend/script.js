@@ -1,4 +1,7 @@
-const SERVER = 'http://localhost:5000';
+// Mismo origen cuando la app se sirve por HTTP (local o Render): SERVER=''
+// => las peticiones van a /ping, /parsear, etc. relativas al host actual.
+// Si se abre el HTML como archivo suelto (file://), usa el server local.
+const SERVER = (location.protocol === 'file:') ? 'http://localhost:5000' : '';
 
 // ── Ejemplos predefinidos ──
 const EJEMPLOS = {

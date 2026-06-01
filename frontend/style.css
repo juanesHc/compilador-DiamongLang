@@ -500,6 +500,48 @@ tr:hover td{background:rgba(124,106,247,0.05);}
 #pane-sintactico .simbolos-table .s-tipo{color:#6897BB;}
 #pane-sintactico .simbolos-table .s-amb{color:#7bd3ec;}
 
+/* ══════════════════════════════════════════════════════════════════════════
+   REDISEÑO ENTREGA FINAL — vistas alternables (errores / árbol / tabla).
+   La card derecha muestra UNA vista a la vez. Errores es la predeterminada
+   y siempre visible; árbol y tabla se invocan con los segmented buttons.
+   El banner #estado-analisis y la traza de pila quedan intactos.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* Zona contenedora: ocupa el espacio restante de la card (flex column) */
+#pane-sintactico #vista-principal-sint{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+/* Cada vista llena la zona y hace su propio scroll interno */
+#pane-sintactico .vista-pane{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;}
+
+/* Cabecera de las vistas alternativas (árbol / tabla) */
+#pane-sintactico .vista-header{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;
+  font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.02em;color:var(--muted);}
+
+/* Botón pequeño "Volver a errores" */
+.btn-sm{padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:6px;}
+.btn-sm .material-symbols-outlined{font-size:16px;}
+
+/* En la vista TABLA, la tabla aprovecha toda la altura disponible: anula el
+   tope del 32% que tenía cuando convivía apilada con los demás paneles. */
+#pane-sintactico #vista-tabla .simbolos-panel.active{flex:1;min-height:0;max-height:none;}
+
+/* Segmented buttons */
+#pane-sintactico .segmented-vistas{display:flex;gap:4px;background:#2B2B2B;padding:4px;
+  border-radius:8px;margin:12px;flex-shrink:0;}
+#pane-sintactico .segmented-btn{flex:1;padding:10px 16px;background:transparent;border:none;
+  color:var(--text);cursor:pointer;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;gap:8px;font-family:'Inter',sans-serif;font-size:13px;transition:background 0.15s;}
+#pane-sintactico .segmented-btn .material-symbols-outlined{font-size:18px;}
+#pane-sintactico .segmented-btn:hover{background:rgba(255,255,255,0.05);}
+#pane-sintactico .segmented-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+
+/* Mensaje "Sin errores" (lo muestra/oculta parsear() según el total de errores) */
+#pane-sintactico #sin-errores-mensaje{flex-direction:column;align-items:center;justify-content:center;
+  flex:1;padding:48px 24px;color:var(--muted);text-align:center;}
+#pane-sintactico #sin-errores-mensaje .material-symbols-outlined{font-size:48px;color:#4CAF50;margin-bottom:12px;}
+#pane-sintactico #sin-errores-mensaje > div{font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;color:var(--text);}
+#pane-sintactico #sin-errores-mensaje .muted{font-size:0.7rem;font-weight:400;color:var(--muted);margin-top:6px;max-width:320px;}
+
 /* traza de pila + 8 badges diferenciados */
 #pane-sintactico .traza-wrap{flex:1;overflow:auto;background:#2B2B2B;}
 #pane-sintactico .traza-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.64rem;}

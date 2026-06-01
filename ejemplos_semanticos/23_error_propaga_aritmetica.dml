@@ -1,0 +1,11 @@
+// Demuestra propagación del tipo ERROR en aritmética.
+// Hay UN solo error real: 'a + "texto"' es entero+cadena.
+// Pero la expresión completa la usa en 3 operaciones más.
+// El sistema reporta solo el error original, no la cascada.
+funcion principal()
+hacer
+    entero a <- 10
+    entero b <- 5
+    entero resultado <- (a + "texto") * 2 + (b - 1)
+    escribir(resultado)
+fin_funcion

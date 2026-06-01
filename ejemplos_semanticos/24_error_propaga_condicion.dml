@@ -1,0 +1,14 @@
+// Demuestra propagación del tipo ERROR en una condición.
+// La condición '(a + "txt") > 0' tiene un error semántico:
+// a (entero) + "txt" (cadena) es inválido.
+// El bloque del si NO debería reportar más errores
+// semánticos por la condición, solo el original.
+funcion principal()
+hacer
+    entero a <- 5
+    si (a + "txt") > 0 entonces
+        escribir("positivo")
+    sino
+        escribir("negativo")
+    fin_si
+fin_funcion

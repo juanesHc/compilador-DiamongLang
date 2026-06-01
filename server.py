@@ -453,6 +453,9 @@ _GRUPO_R2 = 'Regla 2 — Uso no declarado'
 _GRUPO_R3 = 'Regla 3 — Tipos en asignación'
 _GRUPO_R4 = 'Regla 4 — Condición booleana'
 _GRUPO_R5 = 'Regla 5 — Llamadas a función'
+# Grupo nuevo (Entrega Final): demuestra el tipo centinela ERROR del sistema
+# de tipos — supresión de cascadas y aislamiento de errores independientes.
+_GRUPO_ERROR = 'Sistema de Tipos · Cascada ERROR'
 
 _MAPEO_EJEMPLOS_SEM = {
     '01_decl_duplicada_variable.dml':
@@ -499,6 +502,14 @@ _MAPEO_EJEMPLOS_SEM = {
         ('Argumento con error en cascada',            'LLAMADA_TIPO',           _GRUPO_R5),
     '22_llamada_recursiva_ok.dml':
         ('Llamada recursiva bien tipada (válido)',    'LLAMADA_TIPO',           _GRUPO_R5),
+    '23_error_propaga_aritmetica.dml':
+        ('Propagación de ERROR en aritmética',        'TIPO_OPERADOR',          _GRUPO_ERROR),
+    '24_error_propaga_condicion.dml':
+        ('Propagación de ERROR en condición',         'TIPO_OPERADOR',          _GRUPO_ERROR),
+    '25_error_propaga_llamada.dml':
+        ('Propagación de ERROR en llamada',           'TIPO_OPERADOR',          _GRUPO_ERROR),
+    '26_error_aislado_dos_expresiones.dml':
+        ('ERROR aislado: dos errores independientes', 'TIPO_OPERADOR',          _GRUPO_ERROR),
 }
 
 

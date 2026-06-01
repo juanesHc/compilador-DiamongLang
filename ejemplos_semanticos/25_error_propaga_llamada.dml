@@ -1,0 +1,15 @@
+// Demuestra propagación del tipo ERROR en llamadas.
+// El argumento '(b + "x")' tiene un error de tipo.
+// La validación de aridad/tipo de la llamada NO debe
+// reportar un error adicional por el argumento mal tipado.
+funcion duplicar(entero n) retornar entero
+hacer
+    retornar n * 2
+fin_funcion
+
+funcion principal()
+hacer
+    entero b <- 7
+    entero resultado <- duplicar(b + "x")
+    escribir(resultado)
+fin_funcion

@@ -280,50 +280,88 @@
       </div>
     </div>
 
-    <!-- Árbol + paneles (top-right) -->
+    <!-- Vista principal alternable (errores / árbol / tabla) — rediseño Entrega Final.
+         Los errores son la vista por defecto y siempre visible; árbol y tabla son
+         vistas alternativas invocadas por los segmented buttons de abajo. -->
     <div class="syn-panel">
       <div class="syn-hdr">
-        <span class="syn-hdr-title"><span class="material-symbols-outlined" style="color:#9dccf2">account_tree</span>Árbol sintáctico</span>
+        <span class="syn-hdr-title"><span class="material-symbols-outlined" style="color:#9dccf2">analytics</span>Análisis</span>
         <span id="arbol-metodo"></span>
       </div>
-      <!-- Banner de estado combinado: sintáctico + semántico (Etapa 8) -->
+      <!-- Banner de estado combinado: sintáctico + semántico (Etapa 8) — intacto -->
       <div class="estado-analisis" id="estado-analisis"></div>
-      <div class="arbol-wrap" id="arbol-wrap">
-        <div class="empty"><span class="material-symbols-outlined" style="font-size:2.4rem;opacity:0.3">account_tree</span><div>El árbol aparecerá aquí</div></div>
-      </div>
-      <div class="error-log" id="err-sint"></div>
-      <div class="ok-log" id="ok-sint"></div>
-      <!-- Lista numerada de errores sintácticos (Entrega 3) -->
-      <div class="errores-panel" id="errores-panel">
-        <div class="errores-hdr">
-          <span class="material-symbols-outlined">report</span>
-          <span>Errores sintácticos</span>
-          <span id="errores-count" style="color:var(--muted);font-weight:normal"></span>
-          <span style="margin-left:auto;color:var(--muted);font-size:0.58rem;font-weight:normal;text-transform:none;letter-spacing:0">Click para resaltar</span>
+
+      <!-- Zona de vista principal: contiene UNA de las tres vistas a la vez -->
+      <div id="vista-principal-sint">
+
+        <!-- Vista por defecto: ERRORES (sintácticos + semánticos) -->
+        <div id="vista-errores" class="vista-pane">
+          <!-- Lista numerada de errores sintácticos (Entrega 3) -->
+          <div class="errores-panel" id="errores-panel">
+            <div class="errores-hdr">
+              <span class="material-symbols-outlined">report</span>
+              <span>Errores sintácticos</span>
+              <span id="errores-count" style="color:var(--muted);font-weight:normal"></span>
+              <span style="margin-left:auto;color:var(--muted);font-size:0.58rem;font-weight:normal;text-transform:none;letter-spacing:0">Click para resaltar</span>
+            </div>
+            <ol class="errores-list" id="errores-list"></ol>
+          </div>
+          <!-- Lista numerada de errores SEMÁNTICOS (Etapa 8) -->
+          <div class="sem-panel" id="sem-panel">
+            <div class="sem-hdr">
+              <span class="material-symbols-outlined">error</span>
+              <span>Errores semánticos</span>
+              <span id="sem-count" style="color:var(--muted);font-weight:normal"></span>
+              <span style="margin-left:auto;color:var(--muted);font-size:0.58rem;font-weight:normal;text-transform:none;letter-spacing:0">Click para resaltar</span>
+            </div>
+            <ol class="sem-list" id="sem-list"></ol>
+          </div>
+          <!-- Mensaje cuando no hay errores (lo gestiona parsear()) -->
+          <div id="sin-errores-mensaje" style="display:none;">
+            <span class="material-symbols-outlined">check_circle</span>
+            <div>Sin errores</div>
+            <div class="muted">El análisis sintáctico y semántico completó sin reportar problemas.</div>
+          </div>
         </div>
-        <ol class="errores-list" id="errores-list"></ol>
-      </div>
-      <!-- Lista numerada de errores SEMÁNTICOS (Etapa 8) -->
-      <div class="sem-panel" id="sem-panel">
-        <div class="sem-hdr">
-          <span class="material-symbols-outlined">error</span>
-          <span>Errores semánticos</span>
-          <span id="sem-count" style="color:var(--muted);font-weight:normal"></span>
-          <span style="margin-left:auto;color:var(--muted);font-size:0.58rem;font-weight:normal;text-transform:none;letter-spacing:0">Click para resaltar</span>
+
+        <!-- Vista alternativa: ÁRBOL SINTÁCTICO -->
+        <div id="vista-arbol" class="vista-pane" style="display:none;">
+          <div class="vista-header">
+            <span><span class="pdot"></span>Árbol Sintáctico</span>
+            <button id="volver-errores-1" class="btn btn-ghost btn-sm"><span class="material-symbols-outlined">arrow_back</span>Volver a errores</button>
+          </div>
+          <div class="arbol-wrap" id="arbol-wrap">
+            <div class="empty"><span class="material-symbols-outlined" style="font-size:2.4rem;opacity:0.3">account_tree</span><div>El árbol aparecerá aquí</div></div>
+          </div>
+          <div class="error-log" id="err-sint"></div>
+          <div class="ok-log" id="ok-sint"></div>
         </div>
-        <ol class="sem-list" id="sem-list"></ol>
-      </div>
-      <!-- Tabla de símbolos de la fase semántica (Etapa 8) -->
-      <div class="simbolos-panel" id="simbolos-panel">
-        <div class="simbolos-hdr">
-          <span class="material-symbols-outlined">table_chart</span>
-          <span>Tabla de símbolos</span>
-          <span id="simbolos-count" style="color:var(--muted);font-weight:normal"></span>
+
+        <!-- Vista alternativa: TABLA DE SÍMBOLOS -->
+        <div id="vista-tabla" class="vista-pane" style="display:none;">
+          <div class="vista-header">
+            <span><span class="pdot"></span>Tabla de Símbolos</span>
+            <button id="volver-errores-2" class="btn btn-ghost btn-sm"><span class="material-symbols-outlined">arrow_back</span>Volver a errores</button>
+          </div>
+          <!-- Tabla de símbolos de la fase semántica (Etapa 8) -->
+          <div class="simbolos-panel" id="simbolos-panel">
+            <div class="simbolos-hdr">
+              <span class="material-symbols-outlined">table_chart</span>
+              <span>Tabla de símbolos</span>
+              <span id="simbolos-count" style="color:var(--muted);font-weight:normal"></span>
+            </div>
+            <table class="simbolos-table">
+              <thead><tr><th>Nombre</th><th>Categoría</th><th>Tipo</th><th>Ámbito</th></tr></thead>
+              <tbody id="simbolos-body"></tbody>
+            </table>
+          </div>
         </div>
-        <table class="simbolos-table">
-          <thead><tr><th>Nombre</th><th>Categoría</th><th>Tipo</th><th>Ámbito</th></tr></thead>
-          <tbody id="simbolos-body"></tbody>
-        </table>
+      </div>
+
+      <!-- Segmented buttons: invocan las vistas alternativas -->
+      <div class="segmented-vistas">
+        <button id="btn-vista-arbol" class="segmented-btn"><span class="material-symbols-outlined">account_tree</span>Árbol sintáctico</button>
+        <button id="btn-vista-tabla" class="segmented-btn"><span class="material-symbols-outlined">table_view</span>Tabla de símbolos</button>
       </div>
     </div>
 

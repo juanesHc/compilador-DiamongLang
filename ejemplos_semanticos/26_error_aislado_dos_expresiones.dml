@@ -1,0 +1,15 @@
+// Demuestra que el tipo ERROR es selectivo, no silencia todo.
+// Aquí hay DOS errores semánticos en expresiones INDEPENDIENTES.
+// Cada uno debe reportarse: el ERROR de uno no debe esconder
+// al otro, porque no están en la misma cadena de propagación.
+// (Nota: la 2ª variable se llama 'z' porque 'y' es palabra
+//  reservada en DiamondLang — el operador lógico 'y'.)
+funcion principal()
+hacer
+    entero a <- 10
+    entero b <- 20
+    entero x <- a + "primer error"
+    entero z <- b + "segundo error"
+    escribir(x)
+    escribir(z)
+fin_funcion

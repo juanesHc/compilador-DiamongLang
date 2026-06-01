@@ -146,6 +146,17 @@ async function parsear() {
         '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px;font-family:\'Space Mono\',monospace;font-size:0.67rem;">— Solo disponible en el Método Predictivo —</td></tr>';
       document.getElementById('traza-count').textContent = '';
     }
+
+    // Rediseño Entrega Final: mensaje "sin errores" (aditivo — los paneles de
+    // errores ya se ocultan solos cuando están vacíos) y reset a la vista de
+    // errores para que sea siempre lo primero que se ve tras analizar.
+    const totalErrores = (data.errores || []).length +
+                         (data.errores_semanticos || []).length;
+    document.getElementById('sin-errores-mensaje').style.display =
+      totalErrores === 0 ? 'flex' : 'none';
+    if (window._mostrarVistaSint) {
+      window._mostrarVistaSint('errores');
+    }
   } catch(e) { setStatus(false,'Error de conexión'); }
   finally { setLoading('sp2','btn-parse',false); }
 }
@@ -735,6 +746,10 @@ function limpiarSint() {
   document.getElementById('traza-body').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">— Selecciona Método Predictivo y analiza —</td></tr>';
   document.getElementById('traza-count').textContent='';
   document.getElementById('arbol-metodo').textContent='';
+  // Rediseño Entrega Final: ocultar el mensaje "sin errores" y volver a la
+  // vista de errores (estado por defecto) al limpiar.
+  document.getElementById('sin-errores-mensaje').style.display='none';
+  if (window._mostrarVistaSint) window._mostrarVistaSint('errores');
   // Fase C: al limpiar el editor, descartar la traducción y volver al vacío.
   traduccionActual = null;
   renderTraduccionVacio();
@@ -1336,4 +1351,46 @@ function mostrarErrorIA(msg) {
       localStorage.setItem(STORAGE_KEY, '1');
     }
   });
+})();
+
+// ── Vistas alternables del Sintáctico (rediseño Entrega Final) ──
+// Errores es la vista por defecto y siempre visible; árbol y tabla son vistas
+// alternativas invocadas por los segmented buttons. "Volver a errores" cierra
+// la vista activa. parsear() fuerza siempre el reset a 'errores' tras analizar.
+(function() {
+  const STATE = {
+    vista: 'errores',  // 'errores' | 'arbol' | 'tabla'
+  };
+
+  function mostrarVista(vista) {
+    STATE.vista = vista;
+    document.getElementById('vista-errores')
+      .style.display = vista === 'errores' ? '' : 'none';
+    document.getElementById('vista-arbol')
+      .style.display = vista === 'arbol' ? '' : 'none';
+    document.getElementById('vista-tabla')
+      .style.display = vista === 'tabla' ? '' : 'none';
+
+    // Marcar el botón segmentado activo (errores no tiene botón)
+    document.querySelectorAll('.segmented-btn')
+      .forEach(b => b.classList.remove('active'));
+    if (vista === 'arbol') {
+      document.getElementById('btn-vista-arbol').classList.add('active');
+    } else if (vista === 'tabla') {
+      document.getElementById('btn-vista-tabla').classList.add('active');
+    }
+  }
+
+  // Wire de eventos
+  document.getElementById('btn-vista-arbol')
+    .addEventListener('click', () => mostrarVista('arbol'));
+  document.getElementById('btn-vista-tabla')
+    .addEventListener('click', () => mostrarVista('tabla'));
+  document.getElementById('volver-errores-1')
+    .addEventListener('click', () => mostrarVista('errores'));
+  document.getElementById('volver-errores-2')
+    .addEventListener('click', () => mostrarVista('errores'));
+
+  // Exponer para que parsear()/limpiarSint() puedan forzar el reset
+  window._mostrarVistaSint = mostrarVista;
 })();

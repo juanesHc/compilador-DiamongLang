@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════╗
-║      DiamondLang 💎 — Servidor Flask (Entrega 4)        ║
+║    DiamondLang 💎 — Servidor Flask (Entrega Final)      ║
 ║                    server.py                            ║
 ║                                                         ║
 ║  Rutas disponibles:                                     ║
@@ -155,7 +155,7 @@ def _construir_prompt_chat(mensaje: str, historial) -> str:
 # ══════════════════════════════════════════════
 @app.route('/ping', methods=['GET'])
 def ping():
-    return jsonify({'estado': 'DiamondLang server activo 💎 (Entrega 4)'})
+    return jsonify({'estado': 'DiamondLang server activo 💎 (Entrega Final)'})
 
 
 @app.route('/ping_ia', methods=['GET'])
@@ -823,7 +823,7 @@ if __name__ == '__main__':
     import os
     port  = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_DEBUG", "0") == "1"
-    print("\n💎 DiamondLang — Servidor Flask (Entrega 4)")
+    print("\n💎 DiamondLang — Servidor Flask (Entrega Final)")
     print(f"   Corriendo en http://localhost:{port}")
     print("   Abre frontend/diamondlang.html en tu navegador")
     print("   Presiona Ctrl+C para detener\n")

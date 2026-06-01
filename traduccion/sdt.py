@@ -84,7 +84,7 @@ class TraductorJulia:
         self._prescan_funciones(raiz)
 
         if self.con_header:
-            self._emit('# Código Julia generado por DiamondLang Compiler v4.0\n')
+            self._emit('# Código Julia generado por DiamondLang Compiler v5.0\n')
             if self.fecha:
                 self._emit(f'# Fecha de generación: {self.fecha}\n')
             self._emit('\n')

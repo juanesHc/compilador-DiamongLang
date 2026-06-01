@@ -132,7 +132,7 @@
       <div class="flex items-baseline">
         <span class="text-headline-md text-on-surface">Diamond</span>
         <span class="text-headline-md font-bold ml-1" style="color:var(--accent)">Lang</span>
-        <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold font-mono-jetbrains bg-surface-variant text-on-surface-variant">v4.0</span>
+        <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold font-mono-jetbrains bg-surface-variant text-on-surface-variant">v5.0</span>
       </div>
     </div>
     <div class="h-4 w-px mx-2" style="background:var(--border)"></div>
@@ -140,10 +140,6 @@
       <div class="status-dot" id="status-dot"></div>
       <span id="status-text" class="text-body-sm" style="color:var(--muted)">Verificando...</span>
     </div>
-    <!-- Trigger del chatbot (Fase 5a): botón ghost junto al status del servidor -->
-    <button id="chat-header-trigger" type="button" aria-label="Abrir asistente DiamondLang" onclick="toggleChat()">
-      <span class="material-symbols-outlined">chat_bubble</span>
-    </button>
   </div>
 </header>
 
@@ -499,7 +495,7 @@
 ════════════════════════ -->
 <footer id="fs-bar">
   <div class="fs-left">
-    <span id="fs-project">DiamondLang v4.0 · Entrega 4</span>
+    <span id="fs-project">DiamondLang v5.0 · Entrega Final</span>
   </div>
   <div class="fs-right">
     <span id="fs-cursor">Ln 1, Col 1</span>   <!-- Fase 7 (C5): posición viva del cursor de la pestaña activa -->
@@ -547,6 +543,62 @@
         <span class="chat-hint">Enter envía · Shift+Enter nueva línea · ESC cierra</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     MODAL DE BIENVENIDA (Entrega Final) — solo frontend.
+     Aparece en la primera visita (localStorage), z-index 10000.
+════════════════════════════════════════════════ -->
+<div id="welcome-modal" class="welcome-modal">
+  <div class="welcome-backdrop"></div>
+  <div class="welcome-card">
+    <div class="welcome-header">
+      <span class="material-symbols-outlined welcome-icon">diamond</span>
+      <h2>Bienvenido a DiamondLang</h2>
+    </div>
+
+    <div class="welcome-body">
+      <p>
+        DiamondLang es un lenguaje de programación imperativo en
+        español, con tipado estático. Este compilador realiza el
+        análisis léxico, sintáctico, semántico y traduce a Julia
+        ejecutable.
+      </p>
+
+      <p>
+        Escribe código en el editor, analízalo y observa cómo el
+        compilador detecta errores con sugerencias contextuales,
+        o produce código Julia listo para correr.
+      </p>
+
+      <ul class="welcome-features">
+        <li>
+          <span class="material-symbols-outlined">code</span>
+          <span>Análisis en cuatro fases con feedback en tiempo real</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined">auto_awesome</span>
+          <span>Sugerencias enriquecidas por IA (Claude y Gemini)</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined">translate</span>
+          <span>Traducción automática a Julia con anotaciones de tipo</span>
+        </li>
+        <li>
+          <span class="material-symbols-outlined">chat</span>
+          <span>Asistente integrado para resolver dudas sobre el código</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="welcome-footer">
+      <button id="welcome-close-btn" class="btn btn-primary">Empezar</button>
+    </div>
+
+    <p class="welcome-credits">
+      Desarrollado por Juan Esteban Herrera y Jerónimo Quintero Gomez
+    </p>
   </div>
 </div>
 

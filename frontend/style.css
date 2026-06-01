@@ -579,11 +579,6 @@ tr:hover td{background:rgba(124,106,247,0.05);}
   box-shadow:0 4px 14px rgba(0,0,0,0.4);cursor:pointer;z-index:900;transition:all .18s;}
 #chat-fab:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,0.5);}
 #chat-fab .material-symbols-outlined{font-size:26px;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24;}
-/* trigger ghost en el header */
-#chat-header-trigger{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:5px;
-  border-radius:6px;display:inline-flex;align-items:center;transition:all .15s;}
-#chat-header-trigger:hover{background:var(--surface2);color:var(--accent);}
-#chat-header-trigger .material-symbols-outlined{font-size:20px;}
 
 /* overlay / backdrop */
 #chat-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
@@ -796,3 +791,124 @@ ul.tr-ia-section-body li:last-child{margin-bottom:0;}
   opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;
   z-index:5000;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
 .tr-toast-show{opacity:1;transform:translateY(0);}
+
+/* ════════════════════════════════════════════════
+   MODAL DE BIENVENIDA (Entrega Final) — z-index 10000
+   (por encima del chatbot z=1000 y del toast z=5000).
+   Usa las vars de la paleta IntelliJ cálida (:root) y
+   un fallback por si alguna no estuviera definida.
+════════════════════════════════════════════════ */
+.welcome-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-modal.open {
+  display: flex;
+}
+
+.welcome-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.welcome-card {
+  position: relative;
+  background: var(--surface, #3C3F41);
+  border: 1px solid var(--border, #323232);
+  border-radius: 8px;
+  padding: 32px 40px;
+  max-width: 540px;
+  width: 90%;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  animation: welcomeFadeIn 0.25s ease-out;
+}
+
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.welcome-icon {
+  font-size: 36px;
+  color: var(--accent, #f5bd65);
+}
+
+.welcome-header h2 {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text, #A9B7C6);
+}
+
+.welcome-body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text, #A9B7C6);
+  line-height: 1.6;
+}
+
+.welcome-body p {
+  margin: 0 0 14px 0;
+  font-size: 14px;
+}
+
+.welcome-features {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.welcome-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.welcome-features li .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--accent, #f5bd65);
+}
+
+.welcome-footer {
+  margin-top: 28px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.welcome-footer .btn {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.welcome-credits {
+  margin: 18px 0 0 0;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--muted, #808080);
+}

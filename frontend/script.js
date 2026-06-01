@@ -1291,3 +1291,49 @@ function mostrarErrorIA(msg) {
   errEl.style.display = 'block';
   errEl.textContent = msg;
 }
+
+// ── MODAL DE BIENVENIDA ──
+// Aparece solo en la primera visita (localStorage). Se cierra con el
+// botón "Empezar", con Esc o con click en el backdrop; cualquiera de
+// las tres formas marca el localStorage para no volver a mostrarlo.
+// Para volver a verlo en pruebas, ejecutar en la consola del navegador:
+//   localStorage.removeItem('diamondlang_welcome_shown')
+(function() {
+  const STORAGE_KEY = 'diamondlang_welcome_shown';
+  const modal = document.getElementById('welcome-modal');
+  const closeBtn = document.getElementById('welcome-close-btn');
+
+  if (!modal || !closeBtn) return;
+
+  // Mostrar solo si no se ha mostrado antes
+  const yaVisto = localStorage.getItem(STORAGE_KEY);
+  if (!yaVisto) {
+    // Pequeño delay para que la página cargue completa
+    setTimeout(() => {
+      modal.classList.add('open');
+    }, 400);
+  }
+
+  // Cerrar con el botón
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('open');
+    localStorage.setItem(STORAGE_KEY, '1');
+  });
+
+  // Cerrar con Esc
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      modal.classList.remove('open');
+      localStorage.setItem(STORAGE_KEY, '1');
+    }
+  });
+
+  // Cerrar con click en el backdrop (NO en la card)
+  modal.addEventListener('click', (e) => {
+    if (e.target.classList.contains('welcome-backdrop') ||
+        e.target === modal) {
+      modal.classList.remove('open');
+      localStorage.setItem(STORAGE_KEY, '1');
+    }
+  });
+})();

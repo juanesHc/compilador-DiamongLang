@@ -265,7 +265,7 @@ def test_endpoint():
     r = c.post('/traducir', json={"codigo": _func("    escribir(21 * 2)"), "metodo": "predictivo"})
     d = r.get_json()
     check("válido → ok=True y julia no vacío", d.get('ok') is True and bool(d.get('julia')))
-    check("válido → header presente", "DiamondLang Compiler v4.0" in (d.get('julia') or ""))
+    check("válido → header presente", "DiamondLang Compiler v5.0" in (d.get('julia') or ""))
 
     r = c.post('/traducir', json={"codigo": "funcion f()\nhacer\n    si 1 > 0\n        escribir(1)\n    fin_si\nfin_funcion"})
     d = r.get_json()

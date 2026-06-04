@@ -30,6 +30,10 @@
   --tok-bool:#CC7832;    /* booleanos como palabra clave en Darcula → naranja */
   --tok-err:#ffb4ab;     /* error (rosa-rojo claro) consistente con la paleta de errores */
   --tok-cmt:#808080;     /* gris de comentarios IntelliJ Darcula */
+  /* ── Identificador visual del SDT (Traducción) — convención AZUL,
+        análoga al ROJO (sintáctico) y ÁMBAR (semántico). Positivo, no alerta. ── */
+  --sdt-blue:#6897BB;                     /* azul Darcula clásico (mismo tono que --tok-type) */
+  --sdt-blue-soft:rgba(104,151,187,0.18); /* tinte suave del azul SDT */
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
@@ -55,6 +59,8 @@ header{height:48px;display:flex;align-items:center;justify-content:space-between
 .tab .material-symbols-outlined{font-size:16px;}
 .tab:hover{color:var(--text);}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+/* identificador AZUL del SDT: solo el ícono de la pestaña ⑤ Traducción activa */
+.tab.tab-traduccion.active .material-symbols-outlined{color:var(--sdt-blue);}
 
 /* ── PANE (altura ajustada: header 48 + tabs 40 + footer fijo 24 = 112px) ── */
 .pane{display:none;height:calc(100vh - 112px);}
@@ -773,6 +779,9 @@ tr:hover td{background:rgba(124,106,247,0.05);}
 /* — los dos paneles de código side-by-side — */
 #pane-traduccion .grid-2{flex:1 1 auto;min-height:300px;background:#323232;}
 .tr-code-panel{background:#2B2B2B;display:flex;flex-direction:column;overflow:hidden;}
+/* identificador AZUL del SDT: borde lateral solo en el panel del código Julia generado
+   (el panel fuente DiamondLang, #tr-src-code, queda neutro) */
+.tr-code-panel.tr-code-panel-julia{border-left:3px solid var(--sdt-blue);}
 #pane-traduccion .tr-code-hdr{height:34px;padding:0 14px;background:#323232;border-bottom:1px solid #323232;
   text-transform:none;letter-spacing:normal;display:flex;align-items:center;}
 #pane-traduccion .tr-code-hdr > span{display:flex;align-items:center;
